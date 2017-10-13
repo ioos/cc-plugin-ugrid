@@ -12,6 +12,7 @@ It works with the [IOOS Compliance Checker](https://github.com/ioos/compliance-c
 ```bash
 $ source activate [your_env]
 $ conda install -c conda-forge cc-plugin-ugrid
+```
 
 #### `pip`
 
