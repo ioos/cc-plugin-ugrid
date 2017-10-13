@@ -1,0 +1,5 @@
+include VERSION
+include LICENSE
+include README.md
+recursive-include cc_plugin_ugrid *.py
+recursive-include requirements *.txt
