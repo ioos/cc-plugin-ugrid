@@ -1,19 +1,54 @@
 language: python
 
-env:
-    - CONDA="python=2.7"
-    - CONDA="python=3.4"
-    - CONDA="python=3.5"
+sudo: false
+
+matrix:
+  fast_finish: true
+  include:
+  - python: 2.7
+    env: TEST_TARGET=default
+  - python: 3.5
+    env: TEST_TARGET=default
+  - python: 3.6
+    env: TEST_TARGET=default
+  - python: 3.6
+    env: TEST_TARGET=coding_standards
+  - python: 2.7
+    env: TEST_TARGET=latest_compliance_checker
+  - python: 3.6
+    env: TEST_TARGET=latest_compliance_checker
+  allow_failures:
+  - python: 3.6
+    env: TEST_TARGET=coding_standards
+  - python: 2.7
+    env: TEST_TARGET=latest_compliance_checker
+  - python: 3.6
+    env: TEST_TARGET=latest_compliance_checker
 
 before_install:
-    - wget http://bit.ly/miniconda -O miniconda.sh
-    - bash miniconda.sh -b -p $HOME/miniconda
-    - export PATH="$HOME/miniconda/bin:$PATH"
-    - conda config --add channels ioos -f
-    - conda update --yes conda
-    - travis_retry conda create --yes -n TEST $CONDA --file requirements/conda/base.txt
-    - source activate TEST
-    - travis_retry conda install --yes pytest
+  - wget http://bit.ly/miniconda -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
+  - conda update conda
+  - conda config --add channels conda-forge --force
+  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
+  - source activate TEST
+
+install:
+  - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install cc-plugin-ugrid-${version}.tar.gz && popd
 
 script:
-    - py.test -s -rxs -v
+  - if [[ $TEST_TARGET == 'default' ]]; then
+      py.test -s -rxs -v ;
+    fi
+
+  - if [[ $TEST_TARGET == 'latest_compliance_checker' ]]; then
+      conda uninstall compliance-checker ;
+      pip install git+https://github.com/ioos/compliance-checker.git ;
+      py.test -s -rxs -v ;
+    fi
+
+  - if [[ $TEST_TARGET == 'coding_standards' ]]; then
+      find . -type f -name "*.py" | xargs flake8 --max-line-length=100 --ignore W391 ;
+    fi
