@@ -1,2 +1,0 @@
-compliance-checker>=2.0.0
-netCDF4>=1.2.0

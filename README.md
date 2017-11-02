@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ioos/cc-checker-ugrid.svg?branch=master)](https://travis-ci.org/ioos/cc-checker-ugrid)
+
 # UGRID Compliance Checker Plugin
 
 This is a checker for [UGRID](http://ugrid-conventions.github.io/ugrid-conventions) compliance

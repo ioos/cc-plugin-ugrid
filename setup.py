@@ -14,7 +14,7 @@ def version():
     with open('VERSION') as f:
         return f.read().strip()
 
-reqs = [line.strip() for line in open('requirements/pip/base.txt')]
+reqs = [line.strip() for line in open('requirements.txt')]
 
 setup(
     name                 = "cc-plugin-ugrid",
