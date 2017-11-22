@@ -110,7 +110,7 @@ class UgridChecker10(UgridChecker):
         dep = self.check_node_coordinates_size(ds)
         if not dep or dep.value[0] != dep.value[1]:
             return None
-
+        self.node_dim = None
         try:
             mesh = ds.get_variables_by_attributes(cf_role='mesh_topology')[0]
             ncs = mesh.node_coordinates.split(' ')
@@ -121,12 +121,10 @@ class UgridChecker10(UgridChecker):
             return None
         except AttributeError:
             # No node_dimensions attribute... there are larger issues
-            self.node_dim = None
             return None
         except AssertionError:
             m = '"node_coordinates" member "{}" is not a variable'.format(n)
             messages.append(m)
-            self.node_dim = None
         else:
             # verify that the node coordinates' dimensions are equivalent
             node_coord = n
@@ -135,9 +133,9 @@ class UgridChecker10(UgridChecker):
                     assert ds[ncoord].dimensions == ds[node_coord].dimensions
             except AssertionError:
                 # names are not equivalent
-                m = 'names of node coordinates appear to be different'
+                m = 'node_coordinate values must match dimensions in all' +
+                    ' variables in which they are defined'
                 messages.append(m)
-                self.node_dim = None
             else:
                 self.node_dim = ds[ncoord].dimensions[0]
                 score += 1
@@ -373,26 +371,20 @@ class UgridChecker10(UgridChecker):
         # DEPENDENCIES
         self.check_face_dimension(ds)
         self.check_node_coordinates_exist(ds)
-        if ds.get_variables_by_attributes(standard_name='time'):
-            time = ds.get_variables_by_attributes(standard_name='time')[0]
-            self.time_dim = time.dimensions[0]
-        else:
-            self.time_dim = None
 
         level = BaseCheck.MEDIUM
         score = 0
         out_of = 0
         messages = []
         desc = '"location" & "mesh" strongly encouraged for variables with' + \
-                ' dimensions "time" , "node", or "faces" (elements)'
+                ' dimensions "node" or "faces" (elements)'
 
         # check attributes
         for var in ds.variables:
             dims = ds[var].dimensions
             m = ''
             try:
-                assert any(x in dims for x in [self.time_dim, self.node_dim, self.face_dim])
-                # logger.debug('{} -- {} -- {}'.format(self.time_dim, self.node_dim, self.face_dim))
+                assert any(x in dims for x in [self.node_dim, self.face_dim])
                 score += 2
                 out_of += 2
                 if not 'location' in ds[var].ncattrs():

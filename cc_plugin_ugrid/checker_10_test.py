@@ -179,10 +179,10 @@ class TestUgridChecker10(unittest.TestCase):
 
         ncd = self.nc(rs('cc_plugin_ugrid', os.path.join('resources', 'ugrid.nc')))
         r = self.check.check_location_mesh_in_variables(ncd)
-        assert r.value == (14, 14)
+        assert r.value == (8, 8)
 
         # make junk variable
         ncd.createVariable('junk', 'c', dimensions=('nfaces', 'nnodes'))
 
         r = self.check.check_location_mesh_in_variables(ncd)
-        assert r.value == (14, 16)
+        assert r.value == (8, 10)
