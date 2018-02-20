@@ -6,6 +6,8 @@ This is a checker for [UGRID](http://ugrid-conventions.github.io/ugrid-conventio
 
 It works with the [IOOS Compliance Checker](https://github.com/ioos/compliance-checker)
 
+For a brief overview of the attributes the UGRID Checker runs through, check [here](/checks.md).
+
 
 ## Installation
 
