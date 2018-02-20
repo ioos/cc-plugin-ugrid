@@ -60,7 +60,3 @@ docs/_build/
 
 # PyBuilder
 target/
-
-
-*.nc
-*.cdl

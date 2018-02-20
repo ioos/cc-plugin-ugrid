@@ -1,0 +1,53 @@
+netcdf adcirc_reference {
+dimensions:
+	mesh = 1 ;
+	node = 4 ;
+	nele = 8 ;
+	nvertex = 3 ;
+	nbou = 15 ;
+	nope = 2 ;
+	max_nvdll = 7 ;
+	max_nvell = 9 ;
+	time = UNLIMITED ; // (1 currently)
+variables:
+	int adcirc_mesh(mesh) ;
+		adcirc_mesh:long_name = "mesh_topology" ;
+		adcirc_mesh:node_coordinates = "x y" ;
+		adcirc_mesh:face_node_connectivity = "element" ;
+		adcirc_mesh:cf_role = "mesh_topology" ;
+		adcirc_mesh:topology_dimension = 2 ;
+	double depth(node) ;
+		depth:long_name = "distance  below geoid" ;
+		depth:standard_name = "depth below geoid" ;
+		depth:coordinates = "y x" ;
+		depth:location = "node" ;
+		depth:mesh = "adcirc_mesh" ;
+		depth:units = "m" ;
+	int element(nele, nvertex) ;
+		element:long_name = "element" ;
+		element:start_index = 1 ;
+		element:units = "nondimensional" ;
+		element:cf_role = "face_node_connectivity" ;
+	int ibtype(nbou) ;
+		ibtype:long_name = "type of normal flow (discharge) boundary" ;
+		ibtype:units = "nondimensional" ;
+	int ibtypee(nope) ;
+		ibtypee:long_name = "elevation boundary type" ;
+		ibtypee:units = "nondimensional" ;
+	double zeta(time, node) ;
+		zeta:long_name = "water surface elevation above geoid" ;
+		zeta:standard_name = "sea_surface_height_above_geoid" ;
+		zeta:coordinates = "time y x" ;
+		zeta:location = "node" ;
+		zeta:mesh = "adcirc_mesh" ;
+		zeta:units = "m" ;
+		zeta:_FillValue = -99999. ;
+// global attributes:
+		:model = "ADCIRC" ;
+		:grid_type = "Triangular" ;
+		:institution = "University of North Carolina" ;
+		:institution = "University of Notre Dame" ;
+		:source = "ADCIRC" ;
+		:Conventions = "CF-1.6, UGRID-0.9" ;
+		:cdm_data_type = "ugrid" ;
+}

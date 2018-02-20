@@ -366,18 +366,18 @@ class UgridChecker10(UgridChecker):
     def check_location_mesh_in_variables(self, ds):
         """
         Loops through each variable to see if its dimensions contain time,
-        nodes, or elements (faces). If so, imlpements a check for a 'location'
+        nodes, or faces. If so, imlpements a check for a 'location'
         attribute in the variable; fails if it does not exist.
         """
 
         # DEPENDENCIES
         self.check_face_dimension(ds)
         self.check_node_coordinates_exist(ds)
-        if 'time' in ds.get_variables_by_attributes(standard_name='time'):
+        if ds.get_variables_by_attributes(standard_name='time'):
             time = ds.get_variables_by_attributes(standard_name='time')[0]
             self.time_dim = time.dimensions[0]
         else:
-            self.time_dim = None 
+            self.time_dim = None
 
         level = BaseCheck.MEDIUM
         score = 0
@@ -392,6 +392,7 @@ class UgridChecker10(UgridChecker):
             m = ''
             try:
                 assert any(x in dims for x in [self.time_dim, self.node_dim, self.face_dim])
+                # logger.debug('{} -- {} -- {}'.format(self.time_dim, self.node_dim, self.face_dim))
                 score += 2
                 out_of += 2
                 if not 'location' in ds[var].ncattrs():
