@@ -1,4 +1,0 @@
-{
-  "cc_plugin_ugrid/checker_10_test.py::TestUgridChecker10": true,
-  "cc_plugin_ugrid/checker_10_test.py::TestUgridChecker10::test_check_location_loop": true
-}

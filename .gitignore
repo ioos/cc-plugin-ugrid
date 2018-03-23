@@ -62,4 +62,4 @@ docs/_build/
 target/
 
 # pytest
-.pytest_cache
+.pytest_cache/
