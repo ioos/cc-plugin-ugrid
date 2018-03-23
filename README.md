@@ -22,6 +22,8 @@ limitations under the License.
 
 Please see LICENSE for the full license text.
 
+For a brief overview of the attributes the UGRID Checker runs through, check [here](/checks.md).
+
 ## Installation
 
 #### Clone this project
@@ -55,5 +57,3 @@ IOOS compliance checker available checker suites (code version):
  - ioos_sos:0.1 (3.1.1)
  - ioos_sos:latest (3.1.1)
  ```
-
-

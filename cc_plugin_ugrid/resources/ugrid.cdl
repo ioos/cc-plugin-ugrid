@@ -1,0 +1,81 @@
+netcdf fvcom {
+dimensions:
+	time = UNLIMITED ; // (1 currently)
+	nnodes = 5 ;	   // number of nodes
+	nedges = 9 ;	   // number of edges
+	nfaces = 9 ;       // number of nfaces
+	three = 3 ; 	   // extraneous dimension 
+variables:
+	int mesh_topology ;
+		mesh_topology:cf_role = "mesh_topology" ;
+		mesh_topology:topology_dimension = 2 ;
+		mesh_topology:edge_dimension = "nedges" ;
+		mesh_topology:face_dimension = "nfaces" ;
+		mesh_topology:node_coordinates = "lon lat" ;
+		mesh_topology:face_coordinates = "lonc latc" ;
+		mesh_topology:edge_coordinates = "lone late" ;
+		mesh_topology:face_node_connectivity = "nv" ;
+	float lat(nnodes) ;
+		lat:long_name = "latitude" ;
+		lat:standard_name = "latitude" ;
+		lat:units = "degrees_north" ;
+		lat:location = "exists";
+		lat:mesh = "mesh_topology";
+	float late(nedges) ;
+		late:long_name = "latitude centered on edge" ;
+		late:standard_name = "latitude" ;
+		late:units = "degrees_north" ;
+		late:location = "exists";
+		late:mesh = "mesh_topology";
+	float latc(nfaces) ;
+		latc:long_name = "latitude centered on face" ;
+		latc:standard_name = "latitude" ;
+		latc:units = "degrees_north" ;
+		latc:location = "exists";
+		latc:mesh = "mesh_topology";
+	float lon(nnodes) ;
+		lon:long_name = "longitude" ;
+		lon:standard_name = "longitude" ;
+		lon:units = "degrees_east" ;
+		lon:location = "exists";
+		lon:mesh = "mesh_topology";
+	float lone(nfaces) ;
+		lone:long_name = "longitude centered on edge" ;
+		lone:standard_name = "longitude" ;
+		lone:units = "degrees_east" ;
+		lone:location = "exists";
+		lone:mesh = "mesh_topology";
+	float lonc(nfaces) ;
+		lonc:long_name = "longitude centered on face" ;
+		lonc:standard_name = "longitude" ;
+		lonc:units = "degrees_east" ;
+		lonc:location = "exists";
+		lonc:mesh = "mesh_topology";
+	int nv(three, nfaces) ;
+		nv:long_name = "nodes surrounding element" ;
+		nv:cf_role = "face_node_connnectivity" ;
+		nv:start_index = 1 ;
+		nv:location = "exists";
+		nv:mesh = "mesh_topology";
+	float temperature(time, nfaces) ;
+		temperature:location = "exists";
+		temperature:mesh = "mesh_topology";
+	float eastward_velocity(time, nnodes) ;
+		eastward_velocity:location = "exists";
+		eastward_velocity:mesh = "mesh_topology";
+	float northward_velocity(time, nnodes) ;
+		northward_velocity:location = "exists";
+		northward_velocity:mesh = "mesh_topology";
+	float flux(time, nedges) ;
+		flux:location = "exists" ;
+		flux:mesh = "mesh_topology" ;
+	int time(time);
+		time:standard_name = "time" ;
+		time:location = "exists" ;
+		time:mesh = "mesh_topology" ;
+// global attributes:
+		:institution = "School for Marine Science and Technology" ;
+		:source = "FVCOM" ;
+		:references = "http://fvcom.smast.umassd.edu" ;
+		:Conventions = "CF-1.0, UGRID-1.0" ;
+}

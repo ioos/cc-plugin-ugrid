@@ -61,5 +61,5 @@ docs/_build/
 # PyBuilder
 target/
 
-
-*.nc
+# pytest
+.pytest_cache/
