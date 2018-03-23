@@ -133,7 +133,7 @@ class UgridChecker10(UgridChecker):
                     assert ds[ncoord].dimensions == ds[node_coord].dimensions
             except AssertionError:
                 # names are not equivalent
-                m = 'node_coordinate values must match dimensions in all' +
+                m = 'node_coordinate values must match dimensions in all' +\
                     ' variables in which they are defined'
                 messages.append(m)
             else:
