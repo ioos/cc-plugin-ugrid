@@ -3,22 +3,17 @@
 
 from __future__ import with_statement
 from setuptools import setup, find_packages
-
+from cc_plugin_ugrid import __version__
 
 def readme():
     with open('README.md') as f:
         return f.read()
 
-
-def version():
-    with open('VERSION') as f:
-        return f.read().strip()
-
 reqs = [line.strip() for line in open('requirements.txt')]
 
 setup(
     name                 = "cc-plugin-ugrid",
-    version              = version(),
+    version              = __version__,
     description          = "UGRID plugin for the IOOS Compliance Checker Plugin",
     long_description     = readme(),
     license              = 'Apache License 2.0',
