@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import logging
 from compliance_checker.base import BaseNCCheck, Result
 
-with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'VERSION')) as f:
-    __version__ = f.read().strip()
+__version__ = "0.0.1"
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -21,7 +19,7 @@ class UgridChecker(BaseNCCheck):
     _cc_checker_version = __version__
 
     @classmethod
-    def beliefs(cls): 
+    def beliefs(cls):
         return {}
 
     @classmethod
