@@ -4,21 +4,19 @@
 from __future__ import with_statement
 from setuptools import setup, find_packages
 
+import versioneer
+
 
 def readme():
     with open('README.md') as f:
         return f.read()
 
 
-def version():
-    with open('VERSION') as f:
-        return f.read().strip()
-
 reqs = [line.strip() for line in open('requirements.txt')]
 
 setup(
     name                 = "cc-plugin-ugrid",
-    version              = version(),
+    version              = versioneer.get_version(),
     description          = "UGRID plugin for the IOOS Compliance Checker Plugin",
     long_description     = readme(),
     license              = 'Apache License 2.0',
@@ -39,6 +37,7 @@ setup(
     entry_points         = {
         'compliance_checker.suites': [
             'ugrid-1.0 = cc_plugin_ugrid.checker_10:UgridChecker10',
-        ]
-    }
+        ],
+    },
+    cmdclass=versioneer.get_cmdclass(),
 )

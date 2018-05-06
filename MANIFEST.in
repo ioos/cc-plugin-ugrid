@@ -3,3 +3,5 @@ include VERSION
 include LICENSE
 include README.md
 recursive-include cc_plugin_ugrid *.py
+include versioneer.py
+include cc_plugin_ugrid/_version.py

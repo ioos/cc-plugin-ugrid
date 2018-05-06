@@ -5,8 +5,10 @@ import os
 import logging
 from compliance_checker.base import BaseNCCheck, Result
 
-with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'VERSION')) as f:
-    __version__ = f.read().strip()
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
+
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
