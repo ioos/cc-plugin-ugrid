@@ -4,7 +4,7 @@ dimensions:
 	nnodes = 5 ;	   // number of nodes
 	nedges = 9 ;	   // number of edges
 	nfaces = 9 ;       // number of nfaces
-	three = 3 ; 	   // extraneous dimension 
+	three = 3 ; 	   // extraneous dimension
 variables:
 	int mesh_topology ;
 		mesh_topology:cf_role = "mesh_topology" ;
@@ -15,6 +15,16 @@ variables:
 		mesh_topology:face_coordinates = "lonc latc" ;
 		mesh_topology:edge_coordinates = "lone late" ;
 		mesh_topology:face_node_connectivity = "nv" ;
+  int mesh_topology2 ;
+    mesh_topology2:cf_role = "mesh_topology" ;
+    mesh_topology2:topology_dimension = 2 ;
+    mesh_topology2:edge_dimension = "nedges" ;
+    mesh_topology2:face_dimension = "nfaces" ;
+    mesh_topology2:volume_dimension = "nvols" ;
+    mesh_topology2:node_coordinates = "lon lat" ;
+    mesh_topology2:face_coordinates = "lonc latc" ;
+    mesh_topology2:edge_coordinates = "lone late" ;
+    mesh_topology2:face_node_connectivity = "nv" ;
 	float lat(nnodes) ;
 		lat:long_name = "latitude" ;
 		lat:standard_name = "latitude" ;
@@ -66,7 +76,10 @@ variables:
 	float northward_velocity(time, nnodes) ;
 		northward_velocity:location = "exists";
 		northward_velocity:mesh = "mesh_topology";
-	float flux(time, nedges) ;
+  float salinity(time, nfaces) ;
+    salinity:location = "exists";
+    salinity:mesh = "mesh_topology2";
+  float flux(time, nedges) ;
 		flux:location = "exists" ;
 		flux:mesh = "mesh_topology" ;
 	int time(time);

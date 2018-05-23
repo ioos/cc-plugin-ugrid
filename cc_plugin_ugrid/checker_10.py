@@ -27,14 +27,16 @@ class UgridChecker10(UgridChecker):
         score = 0
         out_of = 1
         messages = []
-        desc = 'cf_role:mesh_topology variable exists'
+        desc = 'at least one cf_role:mesh_topology variable exists'
 
         mt = ds.get_variables_by_attributes(cf_role='mesh_topology')
+        # import pdb; pdb.set_trace()
         if len(mt) == 1:
             score += 1
         elif len(mt) > 1:
-            m = ('One variable with attribute "cf_role:mesh_topology" allowed')
+            m = ('Multiple grids allowed')
             messages.append(m)
+            score += 1
         elif len(mt) < 1:
             m = ('Variable with attribute "cf_role:mesh_topology" required')
             messages.append(m)
