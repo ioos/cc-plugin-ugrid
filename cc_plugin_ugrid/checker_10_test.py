@@ -35,17 +35,20 @@ class TestUgridChecker10(unittest.TestCase):
         r = self.check.check_mesh_topology_variable(ncd)
         assert r.value == (1, 1)
 
-        mt = ncd.get_variables_by_attributes(cf_role='mesh_topology')[0]
+        mts = ncd.get_variables_by_attributes(cf_role='mesh_topology')
 
-        mt.cf_role = 'must fail'
+        for mt in mts:
+            mt.cf_role = 'must fail'
         r = self.check.check_mesh_topology_variable(ncd)
         assert r.value == (0, 1)
 
-        mt.cf_role = 'grid_toplogy'
+        for mt in mts:
+            mt.cf_role = 'grid_toplogy'
         r = self.check.check_mesh_topology_variable(ncd)
         assert r.value == (0, 1)
 
-        del mt.cf_role
+        for mt in mts:
+            del mt.cf_role
         r = self.check.check_mesh_topology_variable(ncd)
         assert r.value == (0, 1)
 
