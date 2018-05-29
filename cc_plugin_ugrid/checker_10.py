@@ -30,7 +30,6 @@ class UgridChecker10(UgridChecker):
         desc = 'at least one cf_role:mesh_topology variable exists'
 
         mt = ds.get_variables_by_attributes(cf_role='mesh_topology')
-        # import pdb; pdb.set_trace()
         if len(mt) == 1:
             score += 1
         elif len(mt) > 1:
