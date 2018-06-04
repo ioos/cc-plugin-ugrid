@@ -11,20 +11,20 @@ The UGRID conventions contain a variety of names for geometrical attributes, and
 |edge_node_connectivity               | &bigstar;              | &odot;                 |    &odot;             | &check;           |
 |face_node_connectivity               |                        | &bigstar;              |   &odot;              | &check;           |
 |volume_node_connectivity             |                        |                        |&bigstar;              | &check;           |
-|volume_shape_type                    |                        |                        |&bigstar;              |                   |
-|volume_dimension	                    |                        |                        |&odot;                 |                   |
-|face_dimension	                      |                        |&odot;                  |       &odot;          |                   |
 |edge_dimension	                      |                        |&odot;                  |       &odot;          |                   |
+|face_dimension	                      |                        |&odot;                  |       &odot;          |                   |
+|volume_dimension	                    |                        |                        |&odot;                 |                   |
+|volume_shape_type                    |                        |                        |&bigstar;              |                   |
 |edge_coordinates                     | &odot;                 | &odot;                 | &odot;                |                   |
+|face_coordinates	                    |                        |&odot;                  |        &odot;         |                   ||
+|volume_coordinates	                  |                        |                        |     &odot;            |                   |
+|edge_face_connectivity               |                        |&odot;                  |                       |                   |
+|face_edge_connectivity	              |                        |&odot;                  |     &odot;            |                   |
+|face_face_connectivity               |                        |&odot;                  |                       |                   |
 |volume_edge_connectivity	            |                        |                        |&odot;                 |                   |
 |volume_face_connectivity	            |                        |                        |&odot;                 |                   |
 |volume_volume_connectivity	          |                        |                        | &odot;                |                   |
-|face_edge_connectivity	              |                        |&odot;                  |     &odot;            |                   |
-|face_face_connectivity               |                        |&odot;                  |                       |                   |
-|edge_face_connectivity               |                        |&odot;                  |                       |                   |
 |boundary_node_connectivity	          |                        |&odot;                  |          &odot;       |                   |
-|volume_coordinates	                  |                        |                        |     &odot;            |                   |
-|face_coordinates	                    |                        |&odot;                  |        &odot;         |                   ||
 
 ---
 

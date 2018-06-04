@@ -19,7 +19,7 @@ logger.setLevel(logging.DEBUG)
 class TestUgridChecker10(unittest.TestCase):
 
     def setUp(self):
-        self.check = UgridChecker10()
+        self.check = UgridChecker10()  # TODO made changes to __init__ for the class 
 
     def nc(self, ncpath):
         _, tf = tempfile.mkstemp(suffix='.nc')
