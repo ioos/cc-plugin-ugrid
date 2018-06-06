@@ -1,10 +1,10 @@
-netcdf fvcom {
+netcdf UGRID {
 dimensions:
 	time = UNLIMITED ; // (1 currently)
 	nnodes = 5 ;	   // number of nodes
 	nedges = 9 ;	   // number of edges
 	nfaces = 9 ;       // number of nfaces
-	three = 3 ; 	   // extraneous dimension 
+	three = 3 ; 	   // extraneous dimension
 variables:
 	int mesh_topology ;
 		mesh_topology:cf_role = "mesh_topology" ;
@@ -15,6 +15,15 @@ variables:
 		mesh_topology:face_coordinates = "lonc latc" ;
 		mesh_topology:edge_coordinates = "lone late" ;
 		mesh_topology:face_node_connectivity = "nv" ;
+  int mesh_topology2 ;
+    mesh_topology2:cf_role = "mesh_topology" ;
+    mesh_topology2:topology_dimension = 2 ;
+    mesh_topology2:edge_dimension = "nedges" ;
+    mesh_topology2:face_dimension = "nfaces" ;
+    mesh_topology2:node_coordinates = "lon lat" ;
+    mesh_topology2:face_coordinates = "lonc latc" ;
+    mesh_topology2:edge_coordinates = "lone late" ;
+    mesh_topology2:face_node_connectivity = "nv2" ;
 	float lat(nnodes) ;
 		lat:long_name = "latitude" ;
 		lat:standard_name = "latitude" ;
@@ -53,10 +62,16 @@ variables:
 		lonc:mesh = "mesh_topology";
 	int nv(three, nfaces) ;
 		nv:long_name = "nodes surrounding element" ;
-		nv:cf_role = "face_node_connnectivity" ;
+		nv:cf_role = "face_node_connectivity" ;
 		nv:start_index = 1 ;
 		nv:location = "exists";
 		nv:mesh = "mesh_topology";
+  int nv2(three, nfaces) ;
+		nv:long_name = "nodes surrounding element" ;
+		nv:cf_role = "face_node_connectivity" ;
+		nv:start_index = 1 ;
+		nv:location = "exists";
+		nv:mesh = "mesh_topology2";
 	float temperature(time, nfaces) ;
 		temperature:location = "exists";
 		temperature:mesh = "mesh_topology";

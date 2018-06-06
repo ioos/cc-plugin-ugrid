@@ -8,15 +8,15 @@ The UGRID conventions contain a variety of names for geometrical attributes, and
 |cf_role	                            |&bigstar;               |&bigstar;               |&bigstar;              | &check;           |
 |topology_dimension	                  |1 &bigstar;             |2 &bigstar;             |3 &bigstar;            | &check;           |
 |node_coordinates	                    | &bigstar;              |&bigstar;               | &bigstar;             | &check;           |
+|edge_coordinates                     | &odot;                 | &odot;                 | &odot;                |                   |
+|face_coordinates	                    |                        |&odot;                  |        &odot;         |                   |
 |edge_node_connectivity               | &bigstar;              | &odot;                 |    &odot;             | &check;           |
 |face_node_connectivity               |                        | &bigstar;              |   &odot;              | &check;           |
-|volume_node_connectivity             |                        |                        |&bigstar;              | &check;           |
+|volume_node_connectivity             |                        |                        |&bigstar;              | &check; (Not Tested)|
 |edge_dimension	                      |                        |&odot;                  |       &odot;          |                   |
 |face_dimension	                      |                        |&odot;                  |       &odot;          |                   |
 |volume_dimension	                    |                        |                        |&odot;                 |                   |
-|volume_shape_type                    |                        |                        |&bigstar;              |                   |
-|edge_coordinates                     | &odot;                 | &odot;                 | &odot;                |                   |
-|face_coordinates	                    |                        |&odot;                  |        &odot;         |                   ||
+|volume_shape_type                    |                        |                        |&bigstar;              | &check; (Not Tested)|
 |volume_coordinates	                  |                        |                        |     &odot;            |                   |
 |edge_face_connectivity               |                        |&odot;                  |                       |                   |
 |face_edge_connectivity	              |                        |&odot;                  |     &odot;            |                   |
@@ -30,13 +30,13 @@ The UGRID conventions contain a variety of names for geometrical attributes, and
 
 ### UGRID Plugin Checks
 
-| Check | Summary |
-| ----- | ------- |
+| Check                              | Summary |
+| -----                              | ------- |
 | ```check_mesh_topology_variable``` | Checks to see if a mesh topology variable exists within the dataset |
-| ```check_topology_dimension``` | Verifies the *topology_dimension* attribute is either 1, 2, or 3 |
-| ```check_node_coordinates_size``` | Checks that the mesh's *node_coordinates* length is the same as the *topology_dimension* |
+| ```check_topology_dimension```     | Verifies the *topology_dimension* attribute is either 1, 2, or 3 |
+| ```check_node_coordinates_size```  | Checks that the mesh's *node_coordinates* length is the same as the *topology_dimension* |
 | ```check_node_coordinates_exist``` | *node_coordinates* values must be variables in the dataset |
-| ```check_connectivity``` | Connectivity must exist between nodes in the dataset, whether the connections are node-node (1D), edge-node (2D), or face-node (3D) ||
+| ```check_connectivity```           | Connectivity must exist between nodes in the dataset, whether the connections are node-node (1D), edge-node (2D), or face-node (3D) ||
 
 ---
 

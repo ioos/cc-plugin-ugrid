@@ -23,7 +23,7 @@ class UgridChecker(BaseNCCheck):
     _cc_checker_version = __version__
 
     @classmethod
-    def beliefs(cls): 
+    def beliefs(cls):
         return {}
 
     @classmethod
@@ -31,4 +31,17 @@ class UgridChecker(BaseNCCheck):
         return Result(level, (score, out_of), name, messages)
 
     def setup(self, ds):
-        pass
+        """
+        Set up the UGRID checker by assigning the dataset and creating the dict
+        of meshes it will need to check through.
+
+        Parameters
+        ----------
+        ds : netCDF4 dataset object
+        """
+        self.ds = ds
+        self.meshes = {
+            m:{} for m in self.ds.get_variables_by_attributes(
+                cf_role='mesh_topology'
+            )
+        }

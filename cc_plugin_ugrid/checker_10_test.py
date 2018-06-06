@@ -15,13 +15,18 @@ from cc_plugin_ugrid import logger
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
 
-
 class TestUgridChecker10(unittest.TestCase):
-
-    def setUp(self):
-        self.check = UgridChecker10()  # TODO made changes to __init__ for the class 
+    """Testing class for UGRID checks"""
 
     def nc(self, ncpath):
+        """
+        Return an opened netCDF4 dataset.
+
+        Parameters
+        ----------
+        ncpath : str
+            path to .nc file
+        """
         _, tf = tempfile.mkstemp(suffix='.nc')
         shutil.copy(ncpath, tf)
         ncd = nc4.Dataset(tf, 'r+')
@@ -29,160 +34,69 @@ class TestUgridChecker10(unittest.TestCase):
         self.addCleanup(lambda: os.remove(tf))
         return ncd
 
-    def test_check_mesh_topology_variable(self):
-        ncd = self.nc(rs('cc_plugin_ugrid', os.path.join('resources', 'ugrid.nc')))
+    def setUp(self):
+        """Method to run before every test"""
+        dspath = os.path.join(os.getcwd(), 'cc_plugin_ugrid', 'resources', 'ugrid.nc')
+        dataset = self.nc(dspath)
+        self.checker = UgridChecker10()
+        self.checker.setup(dataset)
 
-        r = self.check.check_mesh_topology_variable(ncd)
-        assert r.value == (1, 1)
-
-        mt = ncd.get_variables_by_attributes(cf_role='mesh_topology')[0]
-
-        mt.cf_role = 'must fail'
-        r = self.check.check_mesh_topology_variable(ncd)
-        assert r.value == (0, 1)
-
-        mt.cf_role = 'grid_toplogy'
-        r = self.check.check_mesh_topology_variable(ncd)
-        assert r.value == (0, 1)
-
-        del mt.cf_role
-        r = self.check.check_mesh_topology_variable(ncd)
-        assert r.value == (0, 1)
-
-    def test_check_topology_dimension(self):
-        ncd = self.nc(rs('cc_plugin_ugrid', os.path.join('resources', 'ugrid.nc')))
-
-        r = self.check.check_topology_dimension(ncd)
-        assert r.value == (1, 1)
-
-        mt = ncd.get_variables_by_attributes(cf_role='mesh_topology')[0]
-
-        mt.topology_dimension = 0
-        r = self.check.check_topology_dimension(ncd)
-        assert r.value == (0, 1)
-
-        mt.topology_dimension = 9
-        r = self.check.check_topology_dimension(ncd)
-        assert r.value == (0, 1)
-
-
-    def test_check_node_coordinates_size(self):
-        ncd = self.nc(rs('cc_plugin_ugrid', os.path.join('resources', 'ugrid.nc')))
-
-        r = self.check.check_node_coordinates_size(ncd)
-        assert r.value == (1, 1)
-
-        mt = ncd.get_variables_by_attributes(cf_role='mesh_topology')[0]
-
-        mt.topology_dimension = 3
-        r = self.check.check_node_coordinates_size(ncd)
-        assert r.value == (0, 1)
-
-        mt.topology_dimension = 2
-        mt.node_coordinates = 'first second third'
-        r = self.check.check_node_coordinates_size(ncd)
-        assert r.value == (0, 1)
-
-    def test_check_node_coordinates_exist(self):
-        ncd = self.nc(rs('cc_plugin_ugrid', os.path.join('resources', 'ugrid.nc')))
-
-        r = self.check.check_node_coordinates_exist(ncd)
-        assert r.value == (1, 1)
-
-        mt = ncd.get_variables_by_attributes(cf_role='mesh_topology')[0]
-
-        mt.node_coordinates = 'foo bar'
-        r = self.check.check_node_coordinates_exist(ncd)
-        assert r.value == (0, 1)
-
-    def test_check_edge_coordinates_exist(self):
+    def test_expected_pass(self):
         """
-        Tests the 'check_edge_coordinates_exist' check.
+        The Ugridchecker10 is set up to loop through the mesh variables inside a
+        dataset, and then loop through the tests for each of these meshes. We
+        leverage this structure to construct the tests for checks that are
+        expected to pass.
         """
-        ncd = self.nc(rs('cc_plugin_ugrid', os.path.join('resources', 'ugrid.nc')))
+        r = self.checker.check1_topology_exists()
+        assert r.value[0] == r.value[1]
 
-        r = self.check.check_edge_coordinates_exist(ncd)
-        assert r.value == (1, 1)
+        for mt in self.checker.meshes:
 
-        mt = ncd.get_variables_by_attributes(cf_role='mesh_topology')[0]
+            r = self.checker._check2_topology_dim(mt)
+            assert r.value[0] == r.value[1]
 
-        mt.edge_coordinates = 'foo bar'
-        r = self.check.check_edge_coordinates_exist(ncd)
-        assert r.value == (0, 1)
+            r = self.checker._check3_connectivity(mt)
+            assert r.value[0] == r.value[1]
 
-    def test_check_connectivity(self):
-        ncd = self.nc(rs('cc_plugin_ugrid', os.path.join('resources', 'ugrid.nc')))
+            r = self.checker._check4_ncoords_exist(mt)
+            assert r.value[0] == r.value[1]
 
-        r = self.check.check_connectivity(ncd)
-        assert r.value == (1, 1)
+            r = self.checker._check8_edge_dimension(mt)
+            assert r.value[0] == r.value[1]
 
-        mt = ncd.get_variables_by_attributes(cf_role='mesh_topology')[0]
+    def test_fail_check1_topology_exists(self):
+        """Test that check1_topology_exists fails without a topology variable"""
+        self.checker.meshes = {}
+        r = self.checker.check1_topology_exists()
+        assert r.value[0] != r.value[1]
 
-        mt.face_node_connectivity = 'FAIL'
-        r = self.check.check_connectivity(ncd)
-        assert r.value == (0, 1)
+    def test_fail_check2_topology_dim(self):
+        """Test _check2_topology_dim fails when the topology dimension is not in
+        [1, 2, 3]"""
+        for mesh in self.checker.meshes:
+            mesh.topology_dimension = 999
+            r = self.checker._check2_topology_dim(mesh)
+            assert r.value[0] != r.value[1]
 
-        del mt.face_node_connectivity
-        r = self.check.check_connectivity(ncd)
-        assert r.value == (0, 1)
+    def test_fail_check3_connectivity(self):
+        """Test _check3_connecivity fails when the defined connectivity vars are
+        not in the variables."""
+        for mesh in self.checker.meshes:
+            self.checker._check2_topology_dim(mesh)
+            # run check that passes to get the appropriate connectivity_type
+            self.checker._check3_connectivity(mesh)
+            # get the connectivity inside the dataset, alter
+            conn_type = self.checker.meshes[mesh].get('connectivity')
+            setattr(mesh, conn_type, 'THIS IS A DRILL')
+            # rerun to failure
+            r = self.checker._check3_connectivity(mesh)
+            assert r.value[0] != r.value[1]
 
-
-    def test_check_face_dimension(self):
-        """
-        Tests whether the check_face_dimension method works properly.
-        """
-
-        ncd = self.nc(rs('cc_plugin_ugrid', os.path.join('resources', 'ugrid.nc')))
-
-        r = self.check.check_face_dimension(ncd)
-        assert r.value == (1, 1)
-
-
-    def test_check_edge_dimension(self):
-        """
-        Tests whether the check_edge_dimension method works properly.
-        """
-
-        ncd = self.nc(rs('cc_plugin_ugrid', os.path.join('resources', 'ugrid.nc')))
-
-        r = self.check.check_edge_dimension(ncd)
-        assert r.value == (1, 1)
-
-        mt = ncd.get_variables_by_attributes(cf_role='mesh_topology')[0]
-
-        mt.edge_dimension = 'nonexistent'
-        r = self.check.check_edge_dimension(ncd)
-        assert r.value == (0, 1)
-
-
-    def test_check_face_coordinates(self):
-        """
-        Tests the check_face_coordinates method.
-        """
-
-        ncd = self.nc(rs('cc_plugin_ugrid', os.path.join('resources', 'ugrid.nc')))
-
-        r = self.check.check_face_coordinates(ncd)
-        assert r.value == (1, 1)
-
-        mt = ncd.get_variables_by_attributes(cf_role='mesh_topology')[0]
-
-        mt.face_coordinates = 'lon lat'
-        r = self.check.check_face_coordinates(ncd)
-        assert r.value == (0, 1)
-
-
-    def test_check_location_mesh_in_variables(self):
-        """
-        Tests the check_location_loop method.
-        """
-
-        ncd = self.nc(rs('cc_plugin_ugrid', os.path.join('resources', 'ugrid.nc')))
-        r = self.check.check_location_mesh_in_variables(ncd)
-        assert r.value == (8, 8)
-
-        # make junk variable
-        ncd.createVariable('junk', 'c', dimensions=('nfaces', 'nnodes'))
-
-        r = self.check.check_location_mesh_in_variables(ncd)
-        assert r.value == (8, 10)
+    def test_fail_check4_ncoords_exist(self):
+        """Test the absence of node coordinates in a dataset."""
+        for mesh in self.checker.meshes:
+            self.checker._check2_topology_dim(mesh)
+            del mesh.node_coordinates
+            r = self.checker._check4_ncoords_exist(mesh)
+            assert r.value[0] != r.value[1]
