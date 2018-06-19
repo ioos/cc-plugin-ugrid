@@ -203,7 +203,7 @@ class UgridChecker10(UgridChecker):
         -----
         Edge coordinates are optional, and points to the auxiliary coordinate
         variables associated with the 'characteristic location' (e.g. midpoint)
-        of the edge. These coorindates have lemgth nEdges, and may have a
+        of the edge. These coorindates have length nEdges, and may have a
         `bounds` attribute specifying the bounding coords of the edge (which
         duplicates the information in the node_coordinates variables).
         """
