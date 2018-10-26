@@ -4,26 +4,26 @@ These tests are designed with respect to the [UGRID conventions](http://ugrid-co
 The UGRID conventions contain a variety of names for geometrical attributes, and the checks output results directly referencing these names. For 1D, 2D, or 3D datasets, the checks will iterate through a series of required attributes. A star (&bigstar;) indicates the convention is required, an o-dot (&odot;) represents optional attributes, and a checkmark (&check;) indicates that our code currently checks for the attribute.   
 
 
-| Topology Attributes	                |   1D                   |   2D                   |   3D                  | Check Implemented    |
+| Topology Attributes	              |   1D                   |   2D                   |   3D                  | Check Implemented    |
 | :------------------------------:    | :---:                  | :---:                  | :---:                 | :---------:          |
-|cf_role	                            | &bigstar;              | &bigstar;              | &bigstar;             | &check;              |
+|cf_role	                          | &bigstar;              | &bigstar;              | &bigstar;             | &check;              |
 |topology_dimension	                  | 1 &bigstar;            | 2 &bigstar;            | 3 &bigstar;           | &check;              |
-|node_coordinates	                    | &bigstar;              | &bigstar;              | &bigstar;             | &check;              |
+|node_coordinates	                  | &bigstar;              | &bigstar;              | &bigstar;             | &check;              |
 |edge_coordinates                     | &odot;                 | &odot;                 | &odot;                |                      |
-|face_coordinates	                    |                        | &odot;                 | &odot;                |                      |
+|face_coordinates	                  |                        | &odot;                 | &odot;                |                      |
 |edge_node_connectivity               | &bigstar;              | &odot;                 | &odot;                | &check;              |
 |face_node_connectivity               |                        | &bigstar;              | &odot;                | &check;              |
 |volume_node_connectivity             |                        |                        | &bigstar;             | &check; (Not Tested) |
 |edge_dimension	                      |                        | &odot;                 | &odot;                |                      |
 |face_dimension	                      |                        | &odot;                 | &odot;                |                      |
-|volume_dimension	                    |                        |                        | &odot;                |                      |
+|volume_dimension	                  |                        |                        | &odot;                |                      |
 |volume_shape_type                    |                        |                        | &bigstar;             | &check; (Not Tested) |
 |volume_coordinates	                  |                        |                        | &odot;                |                      |
 |edge_face_connectivity               |                        | &odot;                 |                       |                      |
 |face_edge_connectivity	              |                        | &odot;                 | &odot;                |                      |
 |face_face_connectivity               |                        | &odot;                 |                       |                      |
-|volume_edge_connectivity	            |                        |                        | &odot;                |                      |
-|volume_face_connectivity	            |                        |                        | &odot;                |                      |
+|volume_edge_connectivity	          |                        |                        | &odot;                |                      |
+|volume_face_connectivity	          |                        |                        | &odot;                |                      |
 |volume_volume_connectivity	          |                        |                        | &odot;                |                      |
 |boundary_node_connectivity	          |                        | &odot;                 | &odot;                |                      |
 
@@ -41,7 +41,7 @@ The core information that should always be included in the metadata, regardless 
 
 Another mandatory piece of metadata, interconnectivity between elements, is dependent on the topology dimension. For one-dimensional grids, one must specify the interconnectivity between edges and nodes in the edge_node_connectivity variable. This variable is a connectivity matrix with dimensions (number of edges x 2). For two-dimensional data, the connection between faces and nodes must be specified in the face_node_connectivity variable with dimensions (number of faces x 3).
 
-Three-dimensional gridding is more complex and nuanced than. Some 3-D meshes are known as layered meshes, and actually treat the horizontal and vertical components separately. In this sense, the mesh is actually treated as two-dimensional. This necessitates the addition of several variables to a dataset:
+Three-dimensional gridding is more complex and nuanced than simple 2D gridding. Some 3-D meshes are known as layered meshes, and actually treat the horizontal and vertical components separately. In this sense, the mesh is actually treated as two-dimensional. This necessitates the addition of several variables to a dataset:
 1.	A variable detailing the number of mesh layers included in the dataset dimension variables
 2.	A variable describing the surface of the mesh, including two UGRID specific attributes:
 a.	mesh attribute, pointing to the mesh of the data
@@ -62,15 +62,15 @@ Other metadata is optional and sometimes quite useful, but would require a lengt
 
 ### UGRID Plugin Checks
 
-| Check                              | Summary |
-| -----                              | ------- |
-| `check1_topology_exists`           | Verify the dataset has at least one mesh topology |
-| `_check2_topology_dim`             | Check the dimension of the mesh topology |
-| `_check3_check3_connectivity`      | Check for the appropriate connectivity level of the mesh |
-| `_check4_ncoords_exist`            | Verify the node coordinates are properly defined |
-| `_check5_check5_edge_coordinates`  | (Optional) check the edge coordinates |
+| Check                              | Summary                                                        |
+| -----                              | -------                                                        |
+| `check1_topology_exists`           | Verify the dataset has at least one mesh topology              |
+| `_check2_topology_dim`             | Check the dimension of the mesh topology                       |
+| `_check3_connectivity`             | Check for the appropriate connectivity level of the mesh       |
+| `_check4_ncoords_exist`            | Verify the node coordinates are properly defined               |
+| `_check5_edge_coordinates`         | (Optional) check the edge coordinates                          |
 | `_check8_edge_dimension`           | (Optional) check the edge dimension of non-standard dimensions |
-| `_check_11_volume_shape_type`      | Verify the volume shapes for 'fully-3D' topologies |
+| `_check_11_volume_shape_type`      | Verify the volume shapes for 'fully-3D' topologies             |
 
 ---
 

@@ -34,6 +34,7 @@ class UgridChecker10(UgridChecker):
         The topology dimension indicates the highest dimensionality of the
         elements in the data.
         """
+
         level = BaseCheck.HIGH
         score = 0
         out_of = 1
@@ -45,7 +46,7 @@ class UgridChecker10(UgridChecker):
         else:
             msg = 'No mesh variable are contained in the dataset.'
             messages.append(msg)
-        # TODO NOTE LOOK maybe this result could be the condition to prompt the
+        # TODO maybe this result could be the condition to prompt the
         # loop through the meshes and complete the rest of the checks
         return self.make_result(level, score, out_of, desc, messages)
 
@@ -60,6 +61,8 @@ class UgridChecker10(UgridChecker):
         ----------
         mesh : netCDF4 mesh variable
         """
+
+        import pdb; pdb.set_trace()
         level = BaseCheck.HIGH
         score = 0
         out_of = 1
@@ -109,6 +112,7 @@ class UgridChecker10(UgridChecker):
             - 2D : matrix of dimension (nFaces, 3)
             - 3D : matrix of dimension (nVolumes, MaxNumNodesPerVolume)
         """
+
         level = BaseCheck.HIGH
         score = 0
         out_of = 1
@@ -162,6 +166,7 @@ class UgridChecker10(UgridChecker):
         Additionally, all node coordinates specified in a mesh must be defined
         as variables in the dataset.
         """
+
         level = BaseCheck.HIGH
         score = 0
         out_of = 1
@@ -201,13 +206,34 @@ class UgridChecker10(UgridChecker):
 
         Notes
         -----
-        Edge coordinates are optional, and points to the auxiliary coordinate
+        Edge coordinates are optional, and point to the auxiliary coordinate
         variables associated with the 'characteristic location' (e.g. midpoint)
         of the edge. These coorindates have length nEdges, and may have a
         `bounds` attribute specifying the bounding coords of the edge (which
         duplicates the information in the node_coordinates variables).
+
+        Simpler: an araay of nEdges-number of midpoints. Metadata should
+        describe the units.
+
+        edge_coordinates requires edge_node_connectivity, which is required if
+        the mesh is 1D and optional if it is 2D or 3D.
         """
-        # TODO
+
+        level = BaseCheck.HIGH
+        score = 0
+        out_of = 1
+        messages = []
+        desc = 'Edge coordinates point to aux coordinate variables representing' +\
+               ' locations of edges (usually midpoint)'
+
+        
+
+        # do(es) the mesh(es) have edge_node_connectivity? If not, pass? Is this accurate?
+
+        if (not self.meshes[mesh]['connectivity'] == 'edge_node_connectivity'):
+            pass
+
+        #return self.make_result(level, score, out_of, desc, messages)
         pass
 
     def _check6_face_coordinates(self, mesh):
@@ -220,11 +246,13 @@ class UgridChecker10(UgridChecker):
         coordinate variables associated with the characteristic location of the
         faces.
         """
+
         # TODO
         pass
 
     def _check7_volume_coordinates(self, mesh):
         """Check the volume coordinates of a given mesh"""
+
         # TODO
         pass
 
@@ -247,6 +275,7 @@ class UgridChecker10(UgridChecker):
 
         # TODO: Find an example of non-standard face_edge_connectivity
         """
+
         level = BaseCheck.MEDIUM
         score = 0
         out_of = 1
@@ -274,18 +303,20 @@ class UgridChecker10(UgridChecker):
                 messages.append(msg)
                 score += 1  # because it's optional
             except KeyError:
-                msg = 'Edge dimension defined in mesh not defined in data ' +\
+                msg = 'Edge dimension defined in mesh, not defined in data ' +\
                       'dimensions'
                 messages.append(msg)
         return self.make_result(level, score, out_of, desc, messages)
 
     def _check9_check_face_dimension(self, mesh):
         """Check the face dimension of a given mesh"""
+
         # TODO
         pass
 
     def _check_10_volume_dimension(self, mesh):
         """Check volume dimension of a given mesh"""
+
         # TODO
         pass
 
@@ -305,6 +336,7 @@ class UgridChecker10(UgridChecker):
         This flag variable must have the same dimension as number of volumes
         contained in the mesh.
         """
+
         level = BaseCheck.HIGH
         score = 0
         out_of = 1
@@ -328,6 +360,99 @@ class UgridChecker10(UgridChecker):
             return self.make_result(level, score, out_of, desc, messages)
         else:
             pass
+
+    # NOTE: for all the below (and maybe some above), look out for _FillValue... and start_index...
+
+    def __check_edge_face_conn(self, mesh):
+        """
+        edge_face_connectivity is a variable pointing to an index of all faces
+        that share the same edge -- i.e., are neighbors on an edge. This index
+        is thus an array of (nEdges x 2). Zero-based indexing is default.
+
+        Dependent on edge_node_connectivity and  face_node_connectivity to have
+        previously defined nEdges and the existence of faces.
+        """
+        pass
+
+    def __check_face_edge_conn(self, mesh):
+        """
+        face_edge_connectivity is a variable pointing to an index identifying
+        the indices of the edges of each face. Edges should be specified in
+        counterclockwise order. This index array should be of size
+        (nFaces x MaxNumNodesPerFace). Zero-based indexing default.
+
+        Dependent on face_node_connectivity and volume_node_connectivity to
+        have previously defined nFaces and volume-node structure.
+        """
+        pass
+
+    def __check_face_face_conn(self, mesh):
+        """
+        face_face_connectivity is a variable pointing to an index identifying
+        every face that shares an edge with another face. The array should be
+        (nFaces x MaxNumNodesPerFace). Zero-based indexing default.
+
+        Dependent on face_node_connectivity and volume_node_connectivity to  
+        have previously defined nFaces and volume-node structure.
+        """
+        pass
+
+    def __check_vol_edge_conn(self, mesh):
+        """
+        volume_edge_connectivity points to a variable identifying the indices
+        of every edge for each volume. Order is determined by geometry type.
+        Zero-based indexing default. The array should be
+        (nVolumes x MaxNumEdgesPerVolume).
+
+        Dependent on volume_shape_type.
+        
+        """
+
+    def __check_vol_face_conn(self, mesh):
+        """
+        volume_face_connectivity points to a variable identifying the indices
+        of every face for each volume. Order is determined by geometry type.
+        Zero-based indexing default. The array should be
+        (nVolumes x MaxNumFacesPerVolume).
+
+        Dependent on volume_shape_type.
+        """
+
+    def __check_vol_vol_conn(self, mesh):
+        """
+        volume_volume_connectivity points to a variable identifying all volumes
+        sharing a face each volume (neighboring volumes). The array should be
+        (nVolumes x MaxNumFacesPerVolume). Zero-based indexing.
+
+        Dependent on volume_node_connectivity to have previously defined
+        volumes to exist.
+        """
+        pass
+
+    def __check_boundary_node_conn(self, mesh):
+        """
+        boundary_node_connectivity points to an index variable. However, the
+        dimensions of the array (a x b) are dictated by the topology dimension
+        of the mesh. 
+
+        For 2D meshes, boundary_node_connectivity points to an index variable
+        identifying for each edge of each boundary the two nodes it connects.
+        Should be of size (nBoundaryEdges x 2).
+
+        For fully unstructured, 3D meshes, the index variable identifies the
+        indices of the nodes of each face for every boundary. This array
+        should be of size (nBoundaryFaces x MaxNumNodesPerFace). From the docs:
+
+        ```
+        Again the indexing convention of boundary_node_connectivity should be
+        specified using the start_index attribute to the index variable
+        (i.e. Mesh2_boundary_nodes) and 0-based indexing is the default.
+        Although constructed of edges, boundaries represent a different
+        quantity than general edge data and thus the boundary_node_connectivity
+        attribute may be specified independent of edge_node_connectivity.
+        ```
+        """
+        pass
 
     def yield_checks(self):
         """Iterate checks"""
@@ -356,6 +481,7 @@ class UgridChecker10(UgridChecker):
         ret_vals : list
             Results of the check methods that have been run
         """
+
         level = BaseCheck.HIGH
         score = 0
         out_of = 1

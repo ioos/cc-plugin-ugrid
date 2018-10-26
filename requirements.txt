@@ -1,2 +1,2 @@
-compliance-checker>=2.0.0
+git+https://github.com/ioos/compliance-checker.git#egg=compliance-checker
 netCDF4>=1.2.0

@@ -5,6 +5,7 @@ dimensions:
 	node = 4 ;
 	siglay = 5 ;
 	three = 3 ;
+    maxStrlen64 = 24;
 variables:
 	double time(time) ;
 		time:long_name = "time" ;
