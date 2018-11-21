@@ -9,19 +9,19 @@ The UGRID conventions contain a variety of names for geometrical attributes, and
 |cf_role	                          | &bigstar;              | &bigstar;              | &bigstar;             | &check;              |
 |topology_dimension	                  | 1 &bigstar;            | 2 &bigstar;            | 3 &bigstar;           | &check;              |
 |node_coordinates	                  | &bigstar;              | &bigstar;              | &bigstar;             | &check;              |
-|edge_coordinates                     | &odot;                 | &odot;                 | &odot;                |                      |
-|face_coordinates	                  |                        | &odot;                 | &odot;                |                      |
+|edge_coordinates                     | &odot;                 | &odot;                 | &odot;                | &check;              |
+|face_coordinates	                  |                        | &odot;                 | &odot;                | &check;              |
 |edge_node_connectivity               | &bigstar;              | &odot;                 | &odot;                | &check;              |
 |face_node_connectivity               |                        | &bigstar;              | &odot;                | &check;              |
-|volume_node_connectivity             |                        |                        | &bigstar;             | &check; (Not Tested) |
-|edge_dimension	                      |                        | &odot;                 | &odot;                |                      |
-|face_dimension	                      |                        | &odot;                 | &odot;                |                      |
+|volume_node_connectivity             |                        |                        | &bigstar;             |                      |
+|edge_dimension	                      |                        | &odot;                 | &odot;                | &check;              |
+|face_dimension	                      |                        | &odot;                 | &odot;                | &check;              |
 |volume_dimension	                  |                        |                        | &odot;                |                      |
-|volume_shape_type                    |                        |                        | &bigstar;             | &check; (Not Tested) |
+|volume_shape_type                    |                        |                        | &bigstar;             |                      |
 |volume_coordinates	                  |                        |                        | &odot;                |                      |
-|edge_face_connectivity               |                        | &odot;                 |                       |                      |
-|face_edge_connectivity	              |                        | &odot;                 | &odot;                |                      |
-|face_face_connectivity               |                        | &odot;                 |                       |                      |
+|edge_face_connectivity               |                        | &odot;                 |                       | &check;              |
+|face_edge_connectivity	              |                        | &odot;                 | &odot;                | &check;              |
+|face_face_connectivity               |                        | &odot;                 |                       | &check;              |
 |volume_edge_connectivity	          |                        |                        | &odot;                |                      |
 |volume_face_connectivity	          |                        |                        | &odot;                |                      |
 |volume_volume_connectivity	          |                        |                        | &odot;                |                      |
@@ -64,28 +64,23 @@ Other metadata is optional and sometimes quite useful, but would require a lengt
 
 | Check                              | Summary                                                        |
 | -----                              | -------                                                        |
-| `check1_topology_exists`           | Verify the dataset has at least one mesh topology              |
-| `_check2_topology_dim`             | Check the dimension of the mesh topology                       |
-| `_check3_connectivity`             | Check for the appropriate connectivity level of the mesh       |
-| `_check4_ncoords_exist`            | Verify the node coordinates are properly defined               |
-| `_check5_edge_coordinates`         | (Optional) check the edge coordinates                          |
-| `_check8_edge_dimension`           | (Optional) check the edge dimension of non-standard dimensions |
-| `_check_11_volume_shape_type`      | Verify the volume shapes for 'fully-3D' topologies             |
+| `_check1_topology_dim`             | Check the topology dimension of the mesh                       |
+| `_check2_connectivity_attrs`       | Check the connectivity attributes of a given mesh              |
+| `_check3_ncoords_exist`            | Verify the node coordinates are properly defined               |
+| `_check4_edge_face_connectivity`   | Check the optional edge_face_connectivity variable             |
+| `_check5_face_edge_connectivity`   | Check the optional face_edge_connectivity variable             |
+| `_check6_face_face_connectivity`   | Check the optional face_face_connectivity variable             |
+
+The `_check2_connectivity_attrs` calls a separate method (`__check_edge_face_coords__) to check `edge_coordinates` and `face_cordinates`.
 
 ---
 
 ### What's Next for the UGRID Checker?
 As the UGRID Checker plugin is a child of IOOS, its development comes from a variety of open-source and commercial efforts. We present development suggestions separated by priority to show the current direction of feature development.
 
-| High-Priority | Mid-Priority             | Low-Priority                 |
-| :---:         | :---:                    | :---:                        |
-|               | `edge_coordinates`       |                              |
-|               | `edge_dimension`         |                              |           
-|               | `face_dimension`         |                              |
-|               | `edge_face_connectivity` |                              |
-|               | `face_edge_connectivity` |                              |
-|               | `face_face_connectivity` |                              |
-|               |                          | `volume_edge_connectivity`   |        
-|               |                          | `volume_face_connectivity`   |        
-|               |                          | `volume_volume_connectivity` |        
-|               |                          | `boundary_node_connectivity` |        
+| Needed Features              |  
+| ---------------              | 
+| `volume_edge_connectivity`   |     
+| `volume_face_connectivity`   |
+| `volume_volume_connectivity` |
+| `boundary_node_connectivity` |

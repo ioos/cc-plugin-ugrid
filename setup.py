@@ -36,7 +36,7 @@ setup(
         ],
     entry_points         = {
         'compliance_checker.suites': [
-            'ugrid-1.0 = cc_plugin_ugrid.checker_10:UgridChecker10',
+            'ugrid = cc_plugin_ugrid.checker:UgridChecker',
         ],
     },
     cmdclass=versioneer.get_cmdclass(),
