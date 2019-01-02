@@ -16,7 +16,7 @@ logger.addHandler(logging.NullHandler())
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
 
-class TestUgridChecker20(unittest.TestCase):
+class TestUgridChecker(unittest.TestCase):
     """Testing class for UGRID checks"""
 
     def nc(self, ncpath):
@@ -43,7 +43,7 @@ class TestUgridChecker20(unittest.TestCase):
 
     def test_expected_pass(self):
         """
-        The Ugridchecker20 is set up to loop through the mesh variables inside a
+        The UgridChecker is set up to loop through the mesh variables inside a
         dataset, and then loop through the tests for each of these meshes. We
         leverage this structure to construct the tests for checks that are
         expected to pass.
