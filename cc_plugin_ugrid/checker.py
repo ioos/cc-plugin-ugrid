@@ -528,7 +528,9 @@ class UgridChecker(UgridChecker):
 
         # use name of array to get that variable from the dataset
         _array = self.ds.variables.get(conn_array_name)
-        dim1, dim2 = _array.get_dims() # unpack tuple
+        _d1name, _d2name = _array.dimensions # tuple of strings
+        dim1 = self.ds.dimensions[_d1name]   # access the dimension objects
+        dim2 = self.ds.dimensions[_d2name]
  
         # check against dimensions of dataset
         try:

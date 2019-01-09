@@ -39,7 +39,7 @@ class TestUgridChecker(unittest.TestCase):
         dspath = os.path.join(os.getcwd(), 'cc_plugin_ugrid', 'resources', 'ugrid.nc')
         dataset = self.nc(dspath)
         self.checker = UgridChecker()
-        self.checker.setup(dataset)
+        self.checker.setup(dataset)   # initializes dict of meshes
 
     def test_expected_pass(self):
         """
