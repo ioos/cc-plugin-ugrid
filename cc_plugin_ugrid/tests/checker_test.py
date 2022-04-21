@@ -36,7 +36,8 @@ class TestUgridChecker(unittest.TestCase):
     def setUp(self):
         """Method to run before every test"""
 
-        dspath = os.path.join(os.getcwd(), 'cc_plugin_ugrid', 'resources', 'ugrid.nc')
+        # dspath = os.path.join(os.getcwd(), 'cc_plugin_ugrid', 'resources', 'ugrid.nc')
+        dspath = '/home/h05/itpp/git/ioos_cc-plugin-ugrid/cc_plugin_ugrid/resources/ugrid.nc'
         dataset = self.nc(dspath)
         self.checker = UgridChecker()
         self.checker.setup(dataset)   # initializes dict of meshes

@@ -36,6 +36,7 @@ class UgridChecker(UgridChecker):
         if not self.meshes[mesh]['topology_dimension']:
             m = 'Mesh does not contain the required attribute "topology_dimension"'
             messages.append(m)
+            # PP: "R103" ugrid-checks@v0.1.2 check.py::L635
 
         try:
             assert self.meshes[mesh]['topology_dimension'] in [1, 2, 3]
@@ -44,6 +45,8 @@ class UgridChecker(UgridChecker):
                 self.meshes[mesh]['topology_dimension'],
                 type(self.meshes[mesh]['topology_dimension']))
             messages.append(m)
+            # PP: "R104" ugrid-checks@v0.1.2 check.py::L646
+            # ***BUT ALSO*** ugrid-checks allows =0, rejects=3
         else:
             score += 1
 
@@ -82,6 +85,8 @@ class UgridChecker(UgridChecker):
             m = 'Mesh does not contain the required attribute "topology_dimension",'+\
                 ' therefore any defined connectivity cannot be verified'
             messages.append(m)
+            # PP: "R104" ugrid-checks@v0.1.2 check.py::L646
+            # ***NOTE*** this test is repeated, also occurs above, L038
             out_of += 1
             return self.make_result(level, score, out_of, desc, messages)
 
@@ -93,6 +98,10 @@ class UgridChecker(UgridChecker):
             if (not self.meshes[mesh][_conn]) and (self.meshes[mesh]['topology_dimension'] == _dim):
                 out_of += 1  # increment out_of, do not increment score
                 m = 'dataset is {}D, so must have "{}"'.format(_dim, _conn)
+                # PP: various, ugrid-checks@v0.1.2 ...
+                # @@ (_dim=1, _conn=edge_node)    : "R112" check.py:L675
+                # @@ (_dim=2, _conn=face_node)    : "R113" check.py:L681
+                # @@ (_dim=3, _conn=volume_node)  : ==UNSUPPORTED==
                 return self.make_result(level, score, out_of, desc, messages)
 
         # now we test individual connectivities -- here we will be incrementing the score
@@ -106,6 +115,9 @@ class UgridChecker(UgridChecker):
                 # required per the standard and we want to check it exists
                 if order == 'nonstd': 
                     self.__check_nonstd_order_dims__(mesh, _conn)
+                    # PP: ???the result is discarded???
+                    #   it returns a Result object
+                    #   (which presumably may be "empty" ???)
 
                 if valid:
                     score += 1
@@ -115,6 +127,7 @@ class UgridChecker(UgridChecker):
 
                 # check for optional attributes edge[face][volume]_coordinates
                 self.__check_edge_face_coords__(mesh, _conn)
+                # PP: result is ignored !!
 
         return self.make_result(level, score, out_of, desc, messages)
 
@@ -135,7 +148,6 @@ class UgridChecker(UgridChecker):
         Additionally, all node coordinates specified in a mesh must be defined
         as variables in the dataset.
         """
-
         level = BaseCheck.HIGH
         score = 0
         out_of = 0
@@ -146,6 +158,8 @@ class UgridChecker(UgridChecker):
         self.meshes[mesh]['node_coordinates'] = []
         if not self.meshes[mesh].get('topology_dimension'):
             msg = 'Failed because no topology dimension exists'
+            # PP: "R104" ugrid-checks@v0.1.2 check.py::L646
+            # ***NOTE*** this test is repeated, also occurs above, L038, L164
             messages.append(msg)
             out_of += 1
             return self.make_result(level, score, out_of, desc, messages)
@@ -153,6 +167,7 @@ class UgridChecker(UgridChecker):
             try:
                 ncoords = mesh.node_coordinates.split(' ')
                 assert len(ncoords) == self.meshes[mesh].get('topology_dimension')
+                # PP: not necessarily required ?? : see below ...
                 for nc in ncoords:
                     try:
                         out_of += 1
@@ -161,14 +176,27 @@ class UgridChecker(UgridChecker):
                         score += 1
                     except AssertionError:
                         msg = 'Node coordinate "{}" in mesh but not in variables'.format(nc)
+                        # PP: "R108" ugrid-checks@v0.1.2 check.py::L714
+                        # *and* one of "R105" (invalid) / "R106" (absent var)
+                        #  -> ugrid-checks@v0.1.2 check.py::L164/173
                         messages.append(msg)
             except AttributeError:
                 msg = 'This mesh has no node coordinate variables'
+                # PP: "R108" ugrid-checks@v0.1.2 check.py::L714
+                # *and* "R105" ugrid-checks@v0.1.2 check.py::L151
                 out_of += 1
                 messages.append(msg)
             except AssertionError:
                 msg = 'The size of mesh\'s node coordinates does not match' +\
                       ' the topology dimension ({})'.format(self.meshes[mesh].get('topology_dimension'))
+                # from above, L168
+                #   len(ncoords) == self.meshes[mesh].get('topology_dimension')
+                # PP: "A mesh must have node coordinates the same length as the
+                #   value for mesh's topology dimension."
+                # ***This is not really true***.  E.G. can have x,y,z coords
+                # defining the points of a 1D or 2D mesh.
+                # Also, in the message "size of mesh\'s node coordinates", the
+                #   term "size" is very confusing
                 out_of += 1
                 messages.append(msg)
 
@@ -207,7 +235,14 @@ class UgridChecker(UgridChecker):
             try:
                 dim1, dim2 = self.ds.variables[efc].shape        # unpack the tuple
                 assert dim1 == self.meshes[mesh]['nedges'].size  # compare to nedges
+                # PP: "R304/305/306/307"  ugrid-checks@v0.1.2 check.py::L442
+                # PP: ugrid-checks checks the dims of the variable, **not** the
+                #   shape - so it insists that it use the "correct" dim,
+                #   NOT just one of the right size.
+                # PP: NOTE - the draft conformance, and ugrid-checks, actually
+                # allow these dims to be swapped -- might be a mistake ...
                 assert dim2 == 2                                 # should be equal to 2
+                # PP: "R308" ugrid-checks@v0.1.2 check.py::L485
                 score += 1
             except AssertionError:
                 messages.append('Incorrect shape ({}, {}) of edge_face_connectivity array'.format(dim1, dim2))
@@ -320,6 +355,8 @@ class UgridChecker(UgridChecker):
 
 
     def __check_edge_face_coords__(self, mesh, cty):
+        # PP: the whole of this is pointless,
+        #  because when called the result is discarded : see above, L129
         """
         Check the edge[face] coordinates of a given mesh.
 
@@ -349,6 +386,7 @@ class UgridChecker(UgridChecker):
         messages = []
         desc = 'Edge coordinates point to aux coordinate variables representing' +\
                ' locations of edges (usually midpoint)'
+        # PP: test name "desc" needs generalising to "face or edge"
 
         coordmap = {
             'edge_node_connectivity': 'edge_coordinates',
@@ -364,6 +402,7 @@ class UgridChecker(UgridChecker):
         if (not self.meshes[mesh][cty]):
             messages.append('No {}?'.format(cty))
             return self.make_result(level, score, out_of, desc, messages)
+            # PP: in this case, out_of should = 0 ??
 
         # first ensure the _coordinates variable exists
         _c = coordmap[cty]
@@ -372,13 +411,16 @@ class UgridChecker(UgridChecker):
         except AttributeError:
             messages.append('Optional attribute, not required')
             return self.make_result(level, score, out_of, desc, messages)
+            # PP: in this case, out_of should = 0 ??
 
         # if it exists, verify its length is equivalent to nedges
         try:
             for coord in coords.split(' '): # split the string
                 _coord_len = len(self.ds.variables[coord])
+                # PP: fails if named vars are missing from dataset ??
                 _dim_len = len(self.ds.dimensions[varmap[_c]])
                 assert _coord_len == _dim_len
+                # PP: prefer testing var.dimensions over var.shape ??
             score += 1
         except AssertionError:
             m = '{} should have length of {}'.format(_c, varmap[_c])
@@ -493,10 +535,13 @@ class UgridChecker(UgridChecker):
         except AttributeError:
             msg = 'Mesh does not contain {}, '.format(dim_var)+\
                   'required when connectivity in non-standard order.'
+            # PP: "" ugrid-checks@v0.1.2 check.py::L836
             return False, msg
         except KeyError:
             msg = 'Edge dimension defined in mesh, not defined in dataset ' +\
                   'dimensions'
+            # PP: message should say "face or edge dimension defined..." ??
+            # PP: "R115/117" ugrid-checks@v0.1.2 check.py::L781
             return False, msg
 
 
@@ -522,18 +567,27 @@ class UgridChecker(UgridChecker):
             assert cty in ['edge_node_connectivity', 'face_node_connectivity', 'volume_node_connectivity']
             conn_array_name = mesh.getncattr(cty)
         except AssertionError:
+            # PP: CAN'T happen, given the possible args this is called with
+            #  - see above, L94
             return False, None # should never get this, right?
         except AttributeError:
             return False, None
 
         # use name of array to get that variable from the dataset
         _array = self.ds.variables.get(conn_array_name)
+        # PP: this seems unsafe -- if a connectivity variable specified in
+        #   a mesh does not exist, checker falls over ?!?
+        #   This does NOT happen for coordinates.
+        #     : See cc_plugin_ugrid/tests/checker_test.py:176
+
         _d1name, _d2name = _array.dimensions # tuple of strings
+        # PP: likewise, unsafe if var doesn't have exactly 2 dims
         dim1 = self.ds.dimensions[_d1name]   # access the dimension objects
         dim2 = self.ds.dimensions[_d2name]
- 
+
         # check against dimensions of dataset
         try:
+            # PP: surely CAN'T fail, as dims came from an actual variable ??
             assert dim1.name in self.ds.dimensions.keys()
             assert dim2.name in self.ds.dimensions.keys()
         except AssertionError:
@@ -550,6 +604,7 @@ class UgridChecker(UgridChecker):
             _dim2size = 2
         elif cty == 'face_node_connectivity':
             _dim1 = 'nfaces'
+            # PP: does not support quad meshes ???
             _dim2size = 3
         else:
             raise NotImplementedError # haven't dealt with real 3D grids yet
