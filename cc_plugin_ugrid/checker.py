@@ -397,6 +397,8 @@ class UgridChecker(UgridChecker):
             'edge_coordinates': 'nedges',
             'face_coordinates': 'nfaces',
         }
+        # PP: don't get this at all -- seems to require fixed names
+        # for face/edge dimensions ???
 
         # do(es) the mesh(es) have appropriate connectivity? If not, pass
         if (not self.meshes[mesh][cty]):
@@ -419,6 +421,8 @@ class UgridChecker(UgridChecker):
                 _coord_len = len(self.ds.variables[coord])
                 # PP: fails if named vars are missing from dataset ??
                 _dim_len = len(self.ds.dimensions[varmap[_c]])
+                # PP: don't get this at all -- seems to require fixed names
+                # for face/edge dimensions ???
                 assert _coord_len == _dim_len
                 # PP: prefer testing var.dimensions over var.shape ??
             score += 1
