@@ -1,7 +1,7 @@
 ### A (very) Brief Summary of UGRID Conventions
 These tests are designed with respect to the [UGRID conventions](http://ugrid-conventions.github.io/ugrid-conventions/).
 
-The UGRID conventions contain a variety of names for geometrical attributes, and the checks output results directly referencing these names. For 1D, 2D, or 3D datasets, the checks will iterate through a series of required attributes. A star (&bigstar;) indicates the convention is required, an o-dot (&odot;) represents optional attributes, and a checkmark (&check;) indicates that our code currently checks for the attribute.   
+The UGRID conventions contain a variety of names for geometrical attributes, and the checks output results directly referencing these names. For 1D, 2D, or 3D datasets, the checks will iterate through a series of required attributes. A star (&bigstar;) indicates the convention is required, an o-dot (&odot;) represents optional attributes, and a checkmark (&check;) indicates that our code currently checks for the attribute.
 
 
 | Topology Attributes	              |   1D                   |   2D                   |   3D                  | Check Implemented    |
@@ -78,9 +78,9 @@ The `_check2_connectivity_attrs` calls a separate method (`__check_edge_face_coo
 ### What's Next for the UGRID Checker?
 As the UGRID Checker plugin is a child of IOOS, its development comes from a variety of open-source and commercial efforts. We present development suggestions separated by priority to show the current direction of feature development.
 
-| Needed Features              |  
-| ---------------              | 
-| `volume_edge_connectivity`   |     
+| Needed Features              |
+| ---------------              |
+| `volume_edge_connectivity`   |
 | `volume_face_connectivity`   |
 | `volume_volume_connectivity` |
 | `boundary_node_connectivity` |
