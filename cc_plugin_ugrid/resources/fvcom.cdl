@@ -108,4 +108,3 @@ variables:
 		:DODS.dimName = "DateStrLen" ;
 		:DODS_EXTRA.Unlimited_Dimension = "time" ;
 }
-

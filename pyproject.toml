@@ -30,7 +30,6 @@ dynamic = [
 documentation = "http://ioos.github.io/compliance-checker/"
 homepage = "https://github.com/ioos/cc-plugin-ugrid"
 repository = "https://github.com/ioos/cc-plugin-ugrid"
-
 [project.entry-points."compliance_checker.suites"]
 "ugrid" = "cc_plugin_ugrid.checker:UgridChecker"
 

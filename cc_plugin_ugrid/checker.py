@@ -1,24 +1,20 @@
 import re
-from cc_plugin_ugrid import UgridChecker 
+
 from compliance_checker.base import BaseCheck
+
+from cc_plugin_ugrid import UgridChecker
 
 
 class UgridChecker(UgridChecker):
+    _cc_spec_version = "2.0"
+    _cc_description = f"UGRID {_cc_spec_version} compliance-checker"
+    _cc_display_headers = {3: "Highly Recommended", 2: "Recommended", 1: "Suggested"}
 
-    _cc_spec_version = '2.0'
-    _cc_description = 'UGRID {} compliance-checker'.format(_cc_spec_version)
-    _cc_display_headers = {
-        3: 'Highly Recommended',
-        2: 'Recommended',
-        1: 'Suggested'
-    }
-
-    METHODS_REGEX = re.compile(r'(\w+: *\w+) \((\w+: *\w+)\) *')
-    PADDING_TYPES = [ "none", "low", "high", "both" ]
+    METHODS_REGEX = re.compile(r"(\w+: *\w+) \((\w+: *\w+)\) *")
+    PADDING_TYPES = ["none", "low", "high", "both"]
 
     def __init__(self):
         pass
-
 
     def _check1_topology_dim(self, mesh):
         """
@@ -31,24 +27,24 @@ class UgridChecker(UgridChecker):
         score = 0
         out_of = 1
         messages = []
-        desc = 'The topology dimension is the highest dimension of the data'
+        desc = "The topology dimension is the highest dimension of the data"
 
-        if not self.meshes[mesh]['topology_dimension']:
+        if not self.meshes[mesh]["topology_dimension"]:
             m = 'Mesh does not contain the required attribute "topology_dimension"'
             messages.append(m)
 
         try:
-            assert self.meshes[mesh]['topology_dimension'] in [1, 2, 3]
+            assert self.meshes[mesh]["topology_dimension"] in [1, 2, 3]
         except AssertionError:
             m = 'Invalid topology_dimension "{}" of type "{}"'.format(
-                self.meshes[mesh]['topology_dimension'],
-                type(self.meshes[mesh]['topology_dimension']))
+                self.meshes[mesh]["topology_dimension"],
+                type(self.meshes[mesh]["topology_dimension"]),
+            )
             messages.append(m)
         else:
             score += 1
 
         return self.make_result(level, score, out_of, desc, messages)
-
 
     def _check2_connectivity_attrs(self, mesh):
         """
@@ -65,7 +61,7 @@ class UgridChecker(UgridChecker):
         2 (face), and 3 (volume) dimensional elements. A mesh's connectivity
         array is dependent on the type of connectivity:
             - 1D : edge_node_connectivity required (nEdges, 2)
-            - 2D : face_node_connectivity required (nFaces, 3); 
+            - 2D : face_node_connectivity required (nFaces, 3);
                    edge_node_connectivity optional
             - 3D : volume_node_connectivity required (nVolumes, MaxNumNodesPerVolume);
                    edge_node_connectivity, face_node_connectivity optional
@@ -76,23 +72,31 @@ class UgridChecker(UgridChecker):
         out_of = 0
         messages = []
 
-        desc = 'Interconnectivity: connection between elements in the mesh'
+        desc = "Interconnectivity: connection between elements in the mesh"
 
-        if not self.meshes[mesh]['topology_dimension']:
-            m = 'Mesh does not contain the required attribute "topology_dimension",'+\
-                ' therefore any defined connectivity cannot be verified'
+        if not self.meshes[mesh]["topology_dimension"]:
+            m = (
+                'Mesh does not contain the required attribute "topology_dimension",'
+                + " therefore any defined connectivity cannot be verified"
+            )
             messages.append(m)
             out_of += 1
             return self.make_result(level, score, out_of, desc, messages)
 
         # verify that at least the requirements are met
-        conns = ['edge_node_connectivity', 'face_node_connectivity', 'volume_node_connectivity']
+        conns = [
+            "edge_node_connectivity",
+            "face_node_connectivity",
+            "volume_node_connectivity",
+        ]
         dims = [1, 2, 3]
 
         for _dim, _conn in zip(dims, conns):
-            if (not self.meshes[mesh][_conn]) and (self.meshes[mesh]['topology_dimension'] == _dim):
+            if (not self.meshes[mesh][_conn]) and (
+                self.meshes[mesh]["topology_dimension"] == _dim
+            ):
                 out_of += 1  # increment out_of, do not increment score
-                m = 'dataset is {}D, so must have "{}"'.format(_dim, _conn)
+                m = f'dataset is {_dim}D, so must have "{_conn}"'
                 return self.make_result(level, score, out_of, desc, messages)
 
         # now we test individual connectivities -- here we will be incrementing the score
@@ -104,20 +108,19 @@ class UgridChecker(UgridChecker):
 
                 # if the order is nonstd, then edge_dim or face_dim is
                 # required per the standard and we want to check it exists
-                if order == 'nonstd': 
+                if order == "nonstd":
                     self.__check_nonstd_order_dims__(mesh, _conn)
 
                 if valid:
                     score += 1
-                else: # notify user of invalid array
-                    m = 'Dataset contains invalid "{}" array'.format(_conn)
+                else:  # notify user of invalid array
+                    m = f'Dataset contains invalid "{_conn}" array'
                     messages.append(m)
 
                 # check for optional attributes edge[face][volume]_coordinates
                 self.__check_edge_face_coords__(mesh, _conn)
 
         return self.make_result(level, score, out_of, desc, messages)
-
 
     def _check3_ncoords_exist(self, mesh):
         """
@@ -140,40 +143,45 @@ class UgridChecker(UgridChecker):
         score = 0
         out_of = 0
         messages = []
-        desc = 'Node coordinates point to aux coordinate variables representing' +\
-               ' locations of nodes'
+        desc = (
+            "Node coordinates point to aux coordinate variables representing"
+            + " locations of nodes"
+        )
 
-        self.meshes[mesh]['node_coordinates'] = []
-        if not self.meshes[mesh].get('topology_dimension'):
-            msg = 'Failed because no topology dimension exists'
+        self.meshes[mesh]["node_coordinates"] = []
+        if not self.meshes[mesh].get("topology_dimension"):
+            msg = "Failed because no topology dimension exists"
             messages.append(msg)
             out_of += 1
             return self.make_result(level, score, out_of, desc, messages)
         else:
             try:
-                ncoords = mesh.node_coordinates.split(' ')
-                assert len(ncoords) == self.meshes[mesh].get('topology_dimension')
+                ncoords = mesh.node_coordinates.split(" ")
+                assert len(ncoords) == self.meshes[mesh].get("topology_dimension")
                 for nc in ncoords:
                     try:
                         out_of += 1
                         assert nc in self.ds.variables
-                        self.meshes[mesh]['node_coordinates'].append(nc)
+                        self.meshes[mesh]["node_coordinates"].append(nc)
                         score += 1
                     except AssertionError:
-                        msg = 'Node coordinate "{}" in mesh but not in variables'.format(nc)
+                        msg = f'Node coordinate "{nc}" in mesh but not in variables'
                         messages.append(msg)
             except AttributeError:
-                msg = 'This mesh has no node coordinate variables'
+                msg = "This mesh has no node coordinate variables"
                 out_of += 1
                 messages.append(msg)
             except AssertionError:
-                msg = 'The size of mesh\'s node coordinates does not match' +\
-                      ' the topology dimension ({})'.format(self.meshes[mesh].get('topology_dimension'))
+                msg = (
+                    "The size of mesh's node coordinates does not match"
+                    + " the topology dimension ({})".format(
+                        self.meshes[mesh].get("topology_dimension"),
+                    )
+                )
                 out_of += 1
                 messages.append(msg)
 
         return self.make_result(level, score, out_of, desc, messages)
-
 
     def _check4_edge_face_conn(self, mesh):
         """edge_face_connectivity is a variable pointing to an index of all faces
@@ -191,38 +199,42 @@ class UgridChecker(UgridChecker):
         score = 0
         out_of = 0
         messages = []
-        desc = 'array of faces sharing the same edge (optional)'
+        desc = "array of faces sharing the same edge (optional)"
 
-        if (not self.meshes[mesh]['nedges']) or (not self.meshes[mesh]['nfaces']):
+        if (not self.meshes[mesh]["nedges"]) or (not self.meshes[mesh]["nfaces"]):
             return self.make_result(level, score, out_of, desc, messages)
 
         else:
             try:
-                efc = mesh.getncattr('edge_face_connectivity')
+                efc = mesh.getncattr("edge_face_connectivity")
                 out_of += 1
             except AttributeError:
-                messages.append('No edge_face_connectivity (optional)')
+                messages.append("No edge_face_connectivity (optional)")
                 return self.make_result(level, score, out_of, desc, messages)
             # check if efc has the right shape
             try:
-                dim1, dim2 = self.ds.variables[efc].shape        # unpack the tuple
-                assert dim1 == self.meshes[mesh]['nedges'].size  # compare to nedges
-                assert dim2 == 2                                 # should be equal to 2
+                dim1, dim2 = self.ds.variables[efc].shape  # unpack the tuple
+                assert dim1 == self.meshes[mesh]["nedges"].size  # compare to nedges
+                assert dim2 == 2  # should be equal to 2
                 score += 1
             except AssertionError:
-                messages.append('Incorrect shape ({}, {}) of edge_face_connectivity array'.format(dim1, dim2))
-                
-        return self.make_result(level, score, out_of, desc, messages)
+                messages.append(
+                    "Incorrect shape ({}, {}) of edge_face_connectivity array".format(
+                        dim1,
+                        dim2,
+                    ),
+                )
 
+        return self.make_result(level, score, out_of, desc, messages)
 
     def _check5_face_edge_conn(self, mesh):
         """face_edge_connectivity is a variable pointing to an index of each
-        edge of each face; it's an array of shape (nFaces x MaxNumNodesPerFace). 
+        edge of each face; it's an array of shape (nFaces x MaxNumNodesPerFace).
         Zero-based indexing is default.If a face has fewer corners/edges
         than MaxNumNodesPerFace, the last edge indices should be equal to
         _FillValue, and the indexing should start at start_index.
 
-        Dependent on face_node_connectivity--and thus 
+        Dependent on face_node_connectivity--and thus
         _check2_connectivity_attrs--to have previously defined the
         existence of faces. Skipped if maxnumnodesperface is not defined.
 
@@ -232,23 +244,22 @@ class UgridChecker(UgridChecker):
         score = 0
         out_of = 0
         messages = []
-        desc = 'array pointing to every index of each edge of each face (optional)'
+        desc = "array pointing to every index of each edge of each face (optional)"
 
-        valid, _out_of, msg = self.__check_fec_ffc__(mesh, 'face_edge_connectivity')
+        valid, _out_of, msg = self.__check_fec_ffc__(mesh, "face_edge_connectivity")
         out_of += _out_of
         messages.append(msg)
 
         if valid:
-           score += 1
-                
-        return self.make_result(level, score, out_of, desc, messages)
+            score += 1
 
+        return self.make_result(level, score, out_of, desc, messages)
 
     def _check6_face_face_conn(self, mesh):
         """
         face_face_connectivity is a variable pointing to an index identifying
         every face that shares an edge with another face. The array should be
-        (nFaces x MaxNumNodesPerFace). Zero-based indexing default. 
+        (nFaces x MaxNumNodesPerFace). Zero-based indexing default.
 
         Dependent on face_node_connectivity to have previously defined nFaces.
 
@@ -258,18 +269,16 @@ class UgridChecker(UgridChecker):
         score = 0
         out_of = 0
         messages = []
-        desc = 'array of every face sharing a face with any other face (optional)'
+        desc = "array of every face sharing a face with any other face (optional)"
 
-        valid, _out_of, msg = self.__check_fec_ffc__(mesh, 'face_face_connectivity')
+        valid, _out_of, msg = self.__check_fec_ffc__(mesh, "face_face_connectivity")
         out_of += _out_of
         messages.append(msg)
 
         if valid:
-           score += 1
-                
+            score += 1
+
         return self.make_result(level, score, out_of, desc, messages)
-
-
 
     def check_run(self, _):
         """
@@ -297,27 +306,25 @@ class UgridChecker(UgridChecker):
         score = 0
         out_of = 1
         messages = []
-        desc = 'Run UGRID checks if mesh variables are present in the data'
+        desc = "Run UGRID checks if mesh variables are present in the data"
         ret_vals = []
         if self.meshes:
             score += 1
             for mesh in self.meshes:
-                for name, check in self.yield_checks():
-                    r = check(mesh)
+                for _, check in self.yield_checks():
+                    _ = check(mesh)
                     ret_vals.append(check(mesh))
         else:
-            msg = 'No mesh variables are detected in the data; all checks fail.'
+            msg = "No mesh variables are detected in the data; all checks fail."
             messages.append(msg)
         ret_vals.append(self.make_result(level, score, out_of, desc, messages))
         return ret_vals
 
-
     def yield_checks(self):
         """Iterate checks"""
         for name in sorted(dir(self)):
-            if name.startswith('_check'):
+            if name.startswith("_check"):
                 yield name, getattr(self, name)
-
 
     def __check_edge_face_coords__(self, mesh, cty):
         """
@@ -347,22 +354,24 @@ class UgridChecker(UgridChecker):
         score = 0
         out_of = 1
         messages = []
-        desc = 'Edge coordinates point to aux coordinate variables representing' +\
-               ' locations of edges (usually midpoint)'
+        desc = (
+            "Edge coordinates point to aux coordinate variables representing"
+            + " locations of edges (usually midpoint)"
+        )
 
         coordmap = {
-            'edge_node_connectivity': 'edge_coordinates',
-            'face_node_connectivity': 'face_coordinates',
-        } 
+            "edge_node_connectivity": "edge_coordinates",
+            "face_node_connectivity": "face_coordinates",
+        }
 
         varmap = {
-            'edge_coordinates': 'nedges',
-            'face_coordinates': 'nfaces',
+            "edge_coordinates": "nedges",
+            "face_coordinates": "nfaces",
         }
 
         # do(es) the mesh(es) have appropriate connectivity? If not, pass
-        if (not self.meshes[mesh][cty]):
-            messages.append('No {}?'.format(cty))
+        if not self.meshes[mesh][cty]:
+            messages.append(f"No {cty}?")
             return self.make_result(level, score, out_of, desc, messages)
 
         # first ensure the _coordinates variable exists
@@ -370,22 +379,21 @@ class UgridChecker(UgridChecker):
         try:
             coords = mesh.getncattr(_c)
         except AttributeError:
-            messages.append('Optional attribute, not required')
+            messages.append("Optional attribute, not required")
             return self.make_result(level, score, out_of, desc, messages)
 
         # if it exists, verify its length is equivalent to nedges
         try:
-            for coord in coords.split(' '): # split the string
+            for coord in coords.split(" "):  # split the string
                 _coord_len = len(self.ds.variables[coord])
                 _dim_len = len(self.ds.dimensions[varmap[_c]])
                 assert _coord_len == _dim_len
             score += 1
         except AssertionError:
-            m = '{} should have length of {}'.format(_c, varmap[_c])
+            m = f"{_c} should have length of {varmap[_c]}"
             messages.append(m)
 
         return self.make_result(level, score, out_of, desc, messages)
-
 
     def __check_fec_ffc__(self, mesh, cty):
         """Checks for the optional variable/attribute of face_edge_connectivity
@@ -401,38 +409,36 @@ class UgridChecker(UgridChecker):
 
         valid = False
         _out_of = 0
-        m = ''
+        m = ""
 
         try:
-            mnpf = self.ds.dimensions.get('maxnumnodesperface')
-        except AttributeError: # skip
-            return valid, _out_of, ''
+            mnpf = self.ds.dimensions.get("maxnumnodesperface")
+        except AttributeError:  # skip
+            return valid, _out_of, ""
 
-        if (not self.meshes[mesh]['nfaces']):
-            m += 'Number of faces (nfaces) not defined'
+        if not self.meshes[mesh]["nfaces"]:
+            m += "Number of faces (nfaces) not defined"
             return valid, _out_of, m
 
         else:
-
             try:
                 _c = mesh.getncattr(cty)
                 _out_of += 1
             except AttributeError:
-                m += 'No {} (optional)'.format(cty)
+                m += f"No {cty} (optional)"
                 return valid, _out_of, m
 
             # check if right shape
             try:
-                dim1, dim2 = self.ds.variables[_c].shape         # unpack the tuple
-                assert dim1 == self.meshes[mesh]['nfaces'].size  # compare to nfaces
-                assert dim2 == mnpf.size                         # should be equal
+                dim1, dim2 = self.ds.variables[_c].shape  # unpack the tuple
+                assert dim1 == self.meshes[mesh]["nfaces"].size  # compare to nfaces
+                assert dim2 == mnpf.size  # should be equal
                 valid = True
             except AssertionError:
-                m += 'Incorrect shape ({}, {}) of {} array'.format(dim1, dim2, cty)
- 
+                m += f"Incorrect shape ({dim1}, {dim2}) of {cty} array"
+
             return valid, _out_of, m
-        
-    
+
     def __check_nonstd_order_dims__(self, mesh, cty):
         """If a connectivity variable pointed to by edge_node_connectivity,
         face_node_connectivity has dimensions listed in non-standard order,
@@ -448,12 +454,14 @@ class UgridChecker(UgridChecker):
         messages = []
 
         dim_map = {  # map to correct dimension requirement
-            'edge_node_connectivity': 'edge_dimension',
-            'face_node_connectivity': 'face_dimension'
+            "edge_node_connectivity": "edge_dimension",
+            "face_node_connectivity": "face_dimension",
         }
 
-        desc = '{} required when dimension orderomg of '.format(dim_map[cty]) +\
-               ' {} vars is non-standard order'.format(cty)
+        desc = (
+            f"{dim_map[cty]} required when dimension orderomg of "
+            + f" {cty} vars is non-standard order"
+        )
 
         # check for the approrpiate dimension
         exists, msg = self.__check_edge_face_dim__(mesh, dim_map[cty])
@@ -465,7 +473,6 @@ class UgridChecker(UgridChecker):
             messages.append(msg)
 
         return self.make_result(level, score, out_of, desc, messages)
-
 
     def __check_edge_face_dim__(self, mesh, dim_var):
         """
@@ -491,14 +498,16 @@ class UgridChecker(UgridChecker):
             self.meshes[mesh][dim_var] = self.ds.dimensions[mesh.getncattr(dim_var)]
             return True, None
         except AttributeError:
-            msg = 'Mesh does not contain {}, '.format(dim_var)+\
-                  'required when connectivity in non-standard order.'
+            msg = (
+                f"Mesh does not contain {dim_var}, "
+                + "required when connectivity in non-standard order."
+            )
             return False, msg
         except KeyError:
-            msg = 'Edge dimension defined in mesh, not defined in dataset ' +\
-                  'dimensions'
+            msg = (
+                "Edge dimension defined in mesh, not defined in dataset " + "dimensions"
+            )
             return False, msg
-
 
     def _validate_nc_shape(self, mesh, cty):
         """For each mesh, ensure the array that the edge/face/node_connectivity
@@ -519,19 +528,23 @@ class UgridChecker(UgridChecker):
         :returns bool: indicator if valid shape and if 'regular' ordering"""
 
         try:
-            assert cty in ['edge_node_connectivity', 'face_node_connectivity', 'volume_node_connectivity']
+            assert cty in [
+                "edge_node_connectivity",
+                "face_node_connectivity",
+                "volume_node_connectivity",
+            ]
             conn_array_name = mesh.getncattr(cty)
         except AssertionError:
-            return False, None # should never get this, right?
+            return False, None  # should never get this, right?
         except AttributeError:
             return False, None
 
         # use name of array to get that variable from the dataset
         _array = self.ds.variables.get(conn_array_name)
-        _d1name, _d2name = _array.dimensions # tuple of strings
-        dim1 = self.ds.dimensions[_d1name]   # access the dimension objects
+        _d1name, _d2name = _array.dimensions  # tuple of strings
+        dim1 = self.ds.dimensions[_d1name]  # access the dimension objects
         dim2 = self.ds.dimensions[_d2name]
- 
+
         # check against dimensions of dataset
         try:
             assert dim1.name in self.ds.dimensions.keys()
@@ -540,28 +553,26 @@ class UgridChecker(UgridChecker):
             return False, None
 
         # determine ordering
-        # NOTE how I check dim2.size; if dim2 does happen to be the "3" variable, 
+        # NOTE how I check dim2.size; if dim2 does happen to be the "3" variable,
         # it could be called literally whatever the modeler wants. What's important is
         # the size. This could be said for the n(Edges)Faces dimension, but this is not
         # assumed as some sort of standard must be applied
 
-        if cty == 'edge_node_connectivity':
-            _dim1 = 'nedges'
+        if cty == "edge_node_connectivity":
+            _dim1 = "nedges"
             _dim2size = 2
-        elif cty == 'face_node_connectivity':
-            _dim1 = 'nfaces'
+        elif cty == "face_node_connectivity":
+            _dim1 = "nfaces"
             _dim2size = 3
         else:
-            raise NotImplementedError # haven't dealt with real 3D grids yet
+            raise NotImplementedError  # haven't dealt with real 3D grids yet
 
         if (dim1.name == _dim1) and (dim2.size == _dim2size):
             # set the attr in the meshes dict
             self.meshes[mesh][_dim1] = self.ds.dimensions[_dim1]
-            return True, 'regular'
+            return True, "regular"
         elif (dim1.size == _dim2size) and (dim2.name == _dim1):
             self.meshes[mesh][_dim1] = self.ds.dimensions[_dim1]
-            return True, 'nonstd'
+            return True, "nonstd"
         else:
             return False, None
-
-
