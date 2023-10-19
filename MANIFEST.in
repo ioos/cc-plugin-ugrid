@@ -10,4 +10,9 @@ exclude .gitignore
 exclude .isort.cfg
 exclude .pre-commit-config.yaml
 exclude *.yml
-exclude cc_plugin_glider/_version.py
+exclude cc_plugin_ugrid/_version.py
+
+exclude checks.md
+recursive-exclude cc_plugin_ugrid *.cdl
+recursive-exclude cc_plugin_ugrid *.nc
+recursive-exclude cc_plugin_ugrid *.nc4
