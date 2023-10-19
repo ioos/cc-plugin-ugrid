@@ -1,7 +1,13 @@
 include *.txt
-include VERSION
-include LICENSE
 include README.md
-recursive-include cc_plugin_ugrid *.py
-include versioneer.py
-include cc_plugin_ugrid/_version.py
+include pyproject.toml
+
+prune .github
+prune *.egg-info
+
+exclude .coveragerc
+exclude .gitignore
+exclude .isort.cfg
+exclude .pre-commit-config.yaml
+exclude *.yml
+exclude cc_plugin_glider/_version.py

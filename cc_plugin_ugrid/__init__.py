@@ -1,14 +1,11 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import os
 import logging
 from compliance_checker.base import BaseNCCheck, Result
 
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
-
+try:
+    from ._version import __version__
+except ImportError:
+    __version__ = "unknown"
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
