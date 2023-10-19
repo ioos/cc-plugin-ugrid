@@ -1,0 +1,82 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [
+  "setuptools>=42",
+  "setuptools_scm",
+  "wheel",
+]
+
+[project]
+name = "cc-plugin-ugrid"
+description = "UGRID plugin for the IOOS Compliance Checker Plugin"
+license = {text = "Apache-2.0"}
+maintainers = [
+    {name = "Brian McKenna", email="brian.mckenna@rpsgroup.com"},
+]
+requires-python = ">=3.8"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dynamic = [
+  "dependencies",
+  "version",
+]
+[project.urls]
+documentation = "http://ioos.github.io/compliance-checker/"
+homepage = "https://github.com/ioos/cc-plugin-ugrid"
+repository = "https://github.com/ioos/cc-plugin-ugrid"
+
+[project.entry-points."compliance_checker.suites"]
+"ugrid" = "cc_plugin_ugrid.checker:UgridChecker"
+
+[tool.setuptools]
+packages = ["cc_plugin_ugrid"]
+include-package-data = true
+license-files = ["LICENSE.txt"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+readme = {file = "README.md", content-type = "text/markdown"}
+
+[tool.setuptools_scm]
+write_to = "cc_plugin_ugrid/_version.py"
+write_to_template = "__version__ = '{version}'"
+tag_regex = "^(?P<prefix>v)?(?P<version>[^\\+]+)(?P<suffix>.*)?$"
+
+[tool.ruff]
+select = [
+    "A", # flake8-builtins
+    "B", # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "F", # flakes
+    "I", # import sorting
+    "T20", # flake8-print
+    "UP", # upgrade
+]
+target-version = "py38"
+line-length = 79
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error:::cc-plugin-ugrid.*",
+    "ignore::UserWarning",
+    "ignore::RuntimeWarning",
+]
+
+[tool.check-manifest]
+ignore = [
+    "*.yml",
+    ".coveragerc",
+    "Makefile",
+    "docs",
+    "docs/*",
+    "notebooks",
+    "notebooks/*",
+    "tests",
+    "tests/*",
+]

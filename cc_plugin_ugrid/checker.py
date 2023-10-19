@@ -13,7 +13,7 @@ class UgridChecker(UgridChecker):
         1: 'Suggested'
     }
 
-    METHODS_REGEX = re.compile('(\w+: *\w+) \((\w+: *\w+)\) *')
+    METHODS_REGEX = re.compile(r'(\w+: *\w+) \((\w+: *\w+)\) *')
     PADDING_TYPES = [ "none", "low", "high", "both" ]
 
     def __init__(self):

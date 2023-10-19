@@ -63,3 +63,5 @@ target/
 
 # pytest
 .pytest_cache/
+
+cc_plugin_ugrid/_version.py

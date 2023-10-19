@@ -6,7 +6,6 @@ import shutil
 import logging
 import unittest
 import tempfile
-from pkg_resources import resource_filename as rs
 
 import netCDF4 as nc4
 
