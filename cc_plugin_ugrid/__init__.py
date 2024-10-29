@@ -1,3 +1,5 @@
+"""Ugrid Checker."""
+
 import logging
 
 from compliance_checker.base import BaseNCCheck, Result
@@ -11,11 +13,13 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class UgridException(Exception):
+class UgridExceptionError(Exception):  # noqa: D101
     pass
 
 
 class UgridChecker(BaseNCCheck):
+    """Ugrid Checker."""
+
     _cc_spec = "UGRID"
     _cc_url = "https://github.com/ioos/cc-plugin-ugrid"
     _cc_author = "Brian McKenna <brian.mckenna@rpsgroup.com>"
@@ -23,16 +27,18 @@ class UgridChecker(BaseNCCheck):
 
     @classmethod
     def beliefs(cls):
+        """Beliefs."""
         return {}
 
     @classmethod
     def make_result(cls, level, score, out_of, name, messages):
+        """Make result."""
         return Result(level, (score, out_of), name, messages)
 
     def setup(self, ds):
-        """
-        Set up the UGRID checker by assigning the dataset and creating the dict
-        of meshes it will need to check through.
+        """UGRID checker.
+
+        Assign the dataset and create the dict of meshes it will need to check through.
 
         Check for attribute existence in the mesh. If an attribute exists,
         each check will assign the value of the attribute to the mesh
@@ -40,18 +46,20 @@ class UgridChecker(BaseNCCheck):
 
         **No validation of the attribute is performed.**
 
-        Parameters
-        ----------
-        ds : netCDF4 dataset object
-        """
+        Args:
+            ds : netCDF4 dataset object
 
+        """
         self.ds = ds
         self.meshes = {
-            m: {} for m in self.ds.get_variables_by_attributes(cf_role="mesh_topology")
+            m: {}
+            for m in self.ds.get_variables_by_attributes(
+                cf_role="mesh_topology",
+            )
         }
 
-        for mesh in self.meshes.keys():
-            for att in [
+        for mesh in self.meshes:
+            for att in (
                 "boundary_node_coordinates",
                 "edge_coordinates",
                 "edge_dimension",
@@ -73,8 +81,8 @@ class UgridChecker(BaseNCCheck):
                 "volume_coordinates",
                 "volume_shape_type",
                 "volume_volume_connectivity",
-            ]:
-                try:
+            ):
+                if hasattr(mesh, att):
                     self.meshes[mesh][att] = mesh.getncattr(att)
-                except AttributeError:  # NetCDF: Attribute not found
+                else:
                     self.meshes[mesh][att] = None
