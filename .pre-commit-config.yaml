@@ -1,0 +1,72 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+    - id: trailing-whitespace
+      exclude: compliance_checker/tests/data
+    - id: check-ast
+    - id: debug-statements
+    - id: end-of-file-fixer
+      exclude: cc_plugin_ncei/tests/data
+    - id: check-docstring-first
+    - id: check-added-large-files
+    - id: check-json
+    - id: check-merge-conflict
+    - id: check-yaml
+    - id: requirements-txt-fixer
+      args:
+        - requirements.txt
+        - requirements-dev.txt
+
+- repo: https://github.com/keewis/blackdoc
+  rev: v0.3.9
+  hooks:
+    - id: blackdoc
+
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.3.0
+  hooks:
+    - id: codespell
+      args:
+        - --ignore-words-list=pres,nd
+      exclude: >
+          (?x)^(
+              .*\.xml|
+              .*\.cdl|
+              .*\.yaml|
+          )$
+
+- repo: https://github.com/econchick/interrogate
+  rev: 1.7.0
+  hooks:
+    - id: interrogate
+      exclude: ^(docs|tests)
+      args: [--config=pyproject.toml]
+
+- repo: https://github.com/asottile/add-trailing-comma
+  rev: v3.1.0
+  hooks:
+    - id: add-trailing-comma
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.7.1
+  hooks:
+    - id: ruff
+      args: ["--fix", "--show-fixes", "--config=pyproject.toml"]
+    - id: ruff-format
+
+- repo: https://github.com/tox-dev/pyproject-fmt
+  rev: v2.4.3
+  hooks:
+    - id: pyproject-fmt
+
+ci:
+    autofix_commit_msg: |
+        [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+        for more information, see https://pre-commit.ci
+    autofix_prs: false
+    autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+    autoupdate_schedule: monthly
+    skip: []
+    submodules: false
