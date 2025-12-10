@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ioos/cc-checker-ugrid.svg?branch=master)](https://travis-ci.org/ioos/cc-checker-ugrid)
+[![Build Status](https://github.com/ioos/cc-plugin-ugrid/actions/workflows/tests.yml/badge.svg)](https://github.com/ioos/cc-plugin-ugrid/actions/workflows/tests.yml)
 
 # UGRID Compliance Checker Plugin
 
